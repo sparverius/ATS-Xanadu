@@ -5,7 +5,7 @@
 (***********************************************************************)
 
 (*
-** ATS/Xanadu - Unleashing the Potential of Types!
+** ATS/Postiats - Unleashing the Potential of Types!
 ** Copyright (C) 2018 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
@@ -13,12 +13,12 @@
 ** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
 ** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-** 
+**
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-** 
+**
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -33,28 +33,48 @@
 //
 (* ****** ****** *)
 //
-#include
-"share/atspre_staload.hats"
+#staload "libats/SATS/stdio.sats"
+#staload _ = "libats/DATS/stdio.dats"
+#staload "libats/SATS/print.sats"
+#staload _ = "libats/DATS/print.dats"
+#staload "libats/SATS/gint.sats"
+#staload _ = "libats/DATS/gint.dats"
+#staload "libats/SATS/gptr.sats"
+#staload _ = "libats/DATS/gptr.dats"
+
+#staload "libats/SATS/string.sats"
+#staload _ = "libats/DATS/string.dats"
+
+#staload "libats/SATS/stropt.sats"
+#staload _ = "libats/DATS/stropt.dats"
+
+#staload "libats/SATS/array.sats"
+#staload _ = "libats/DATS/array.dats"
+
+(* ****** ****** *)
+
+extern castfn
+stropt0_unsome(opt: stropt):<> string0
+
+(* ****** ****** *)
+
 #staload
-UN = "prelude/SATS/unsafe.sats"
+UN =
+"libats/SATS/unsafe.sats"
 //
 (* ****** ****** *)
 //
 #staload
-"./../../xutl/SATS/cblist.sats"
-#staload
-"./../../xutl/SATS/mylibc.sats"
-//
-(* ****** ****** *)
-//
-(*
-#staload
-LOC = "./../SATS/locinfo.sats"
-*)
+"./../SATS/location.sats"
 //
 (* ****** ****** *)
 //
 #staload "./../SATS/lexbuf.sats"
+//
+(* ****** ****** *)
+//
+#staload
+"./../../util/SATS/cblist.sats"
 //
 (* ****** ****** *)
 //
@@ -93,7 +113,7 @@ val () = buf.ncol := 0
 val () = buf.nspc := 0
 *)
 //
-val () = buf.cbuf := stropt_none()
+val () = buf.cbuf := stropt0_none()
 //
 val () = buf.begp := NULL
 val () = buf.endp := NULL
@@ -122,7 +142,7 @@ lexbuf_get_none
   (buf) =
 (
   buf.begp := buf.curp;
-  buf.cbuf := stropt_none()
+  buf.cbuf := stropt0_none()
 )
 
 (* ****** ****** *)
@@ -136,45 +156,54 @@ lexbuf_get_fullseg
 val
 cbf = buf.cbuf
 val ((*void*)) =
-buf.cbuf := stropt_none()
+buf.cbuf := stropt0_none()
 //
 in
 //
 (
 if
-stropt_is_none(cbf)
+stropt0_iseqz(cbf)
 then let
   val A0 =
-  arrayptr_make_uninitized<char>(sz+1)
+  (* arrayptr_make_none<char>(sz+1) *)
+  arrayptr_make_none<char>(g1ofg0(sz+$UN.cast{usize}1))
 //
-  val p0 = ptrcast(A0)
-  val _(*ptr*) = xatsopt_memcpy(p0, bp, sz)
+  val p0 = ptrof(A0)
+  val () =
+  $extfcall(void, "memcpy", p0, bp, sz)
 in
   $UN.castvwtp0(A0) where {
-    val () = $UN.ptr0_set_at<char>(p0, sz, CNUL)
+    val () = //$UN.ptr0_set_at<char>(p0, sz, CNUL)
+    $UN.ptr0_set<char>(ptr0_add_size<char>(p0, sz), CNUL);
   }
 end // end of [then]
 else let
   val cs =
-  stropt_unsome(cbf)
+  stropt0_unsome(cbf)
   val n0 = length(cs)
 //
 (*
   val () = println!("cs = ", cs)
 *)
 //
+  val num0 = $UN.cast{uint}(n0 + g1ofg0(sz))
+  val num1 = g1ofg0(g0add_uint0_usize(num0, $UN.cast{usize}(1)))
   val A0 =
-  arrayptr_make_uninitized<char>(n0+sz+1)
+  arrayptr_make_none<char>(num1)//n0+sz+1)
 //
-  val p0 = ptrcast(A0)
-  val p1 = ptr_add<char>(p0, n0)
-  val cs = string2ptr(cs)
-  val _(*ptr*) = xatsopt_memcpy(p0, cs, n0)
-  val _(*ptr*) = xatsopt_memcpy(p1, bp, sz)
+  val p0 = ptrof(A0)
+  val p1 = ptr0_add<char>(p0, n0)
+  val () =
+    $extfcall(void, "memcpy", p0, cs, n0)
+  // end of [val]
+  val () =
+    $extfcall(void, "memcpy", p1, bp, sz)
+  // end of [val]
 //
 in
   $UN.castvwtp0(A0) where {
-    val () = $UN.ptr0_set_at<char>(p1, sz, CNUL)
+    val () = //$UN.ptr0_set_at<char>(p1, sz, CNUL)
+    $UN.ptr0_set<char>(ptr0_add_size<char>(p1, sz), CNUL);
   }
 end // end of [else]
 ) where
@@ -182,7 +211,8 @@ end // end of [else]
   val bp = buf.begp
   val cp = buf.curp
   val () = buf.begp := cp
-  val sz = $UN.cast{Size}(ptr0_diff<char>(cp, bp))
+  //val sz = $UN.cast{size}(ptr0_diff<char>(cp, bp))
+  val sz = $UN.cast{size}((g0sub_ptr_ptr(cp, bp)/sizeof<char>))
 }
 //
 end // end of [lexbuf_get_fullseg]
@@ -199,45 +229,55 @@ cbf_update
 (buf: &lexbuf >> _): void =
 (
 if
-stropt_is_none(cbf)
+stropt0_iseqz(cbf)
 then let
   val A0 =
-  arrayptr_make_uninitized<char>(sz+1)
+  arrayptr_make_none<char>(g1ofg0(sz+$UN.cast{usize}1))//sz+1)
 //
-  val p0 = ptrcast(A0)
-  val _(*ptr*) = xatsopt_memcpy(p0, bp, sz)
+  val p0 = ptrof(A0)
+  val () =
+  $extfcall(void, "memcpy", p0, bp, sz)
 in
-  $UN.ptr0_set_at<char>(p0, sz, CNUL);
-  buf.cbuf := stropt_some($UN.castvwtp0(A0))
+  $UN.ptr0_set<char>(ptr0_add_size<char>(p0, sz), CNUL);
+  (* $UN.ptr0_set_at<char>(p0, sz, CNUL); *)
+  buf.cbuf := stropt0_some($UN.castvwtp0(A0))
 end // end of [then]
 else let
 //
   val cs =
-  stropt_unsome(cbf)
+  stropt0_unsome(cbf)
   val n0 = length(cs)
 //
 (*
   val () = println!("cs = ", cs)
 *)
 //
+  val num0 = $UN.cast{uint}(n0 + g1ofg0(sz))
+  val num1 = g1ofg0(g0add_uint0_usize(num0, $UN.cast{usize}(1)))
+
   val A0 =
-  arrayptr_make_uninitized<char>(n0+sz+1)
+  arrayptr_make_none<char>(num1)//n0+sz+1)
 //
-  val p0 = ptrcast(A0)
-  val p1 = ptr_add<char>(p0, n0)
-  val cs = string2ptr(cs)
-  val _(*ptr*) = xatsopt_memcpy(p0, cs, n0)
-  val _(*ptr*) = xatsopt_memcpy(p1, bp, sz)
+  val p0 = ptrof(A0)
+  val p1 = ptr0_add<char>(p0, n0)
+  val () =
+    $extfcall(void, "memcpy", p0, cs, n0)
+  // end of [val]
+  val () =
+    $extfcall(void, "memcpy", p1, bp, sz)
+  // end of [val]
 //
 in
-  $UN.ptr0_set_at<char>(p1, sz, CNUL);
-  buf.cbuf := stropt_some($UN.castvwtp0(A0))
+  (* $UN.ptr0_set_at<char>(p1, sz, CNUL); *)
+  $UN.ptr0_set<char>(ptr0_add_size<char>(p1, sz), CNUL);
+  buf.cbuf := stropt0_some($UN.castvwtp0(A0))
 end // end of [else]
 ) where
 {
   val bp = buf.begp
   val ep = buf.endp
-  val sz = $UN.cast{Size}(ptr0_diff<char>(ep, bp))
+  (* val sz = $UN.cast{size}(ptr0_diff<char>(ep, bp)) *)
+  val sz = $UN.cast{size}((g0sub_ptr_ptr(ep, bp)/sizeof<char>))
   val cbf = buf.cbuf
 } (* end of [cbf_update] *)
 
@@ -258,9 +298,9 @@ then let
   val uc =
   $UN.ptr0_get<uchar>(cp)
   val () =
-  buf.curp := ptr_succ<uchar>(cp)
+  buf.curp := ptr0_succ<uchar>(cp)
 in
-  let val uc = uchar2int0(uc) in uc end
+  let val uc = (* uchar2int0 *)$UN.cast{sint}(uc) in uc end
 end // end of [then]
 else let
   val cbs = buf.cbtail
@@ -284,8 +324,8 @@ in
 //
     ) where
     {
-      val bp = ptrcast(A0)
-      val ep = ptr_add<char>(bp, sz)
+      val bp = ptrof(A0)
+      val ep = ptr0_add<char>(bp, sz)
       val A0 = $UN.cast(A0)
     } (* end of [cblist_cons] *)
 end // end of [else]
@@ -306,7 +346,7 @@ val cp = buf.curp
 //
 in
   if cp > bp
-    then buf.curp := ptr_pred<char>(cp)
+    then buf.curp := ptr0_pred<char>(cp)
     else ((*void*))
   // end of [if]
 end // end of [let]

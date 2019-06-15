@@ -5,7 +5,7 @@
 (***********************************************************************)
 
 (*
-** ATS/Xanadu - Unleashing the Potential of Types!
+** ATS/Postiats - Unleashing the Potential of Types!
 ** Copyright (C) 2018 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
@@ -13,12 +13,12 @@
 ** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
 ** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-** 
+**
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-** 
+**
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -32,26 +32,34 @@
 // Authoremail: gmhwxiATgmailDOTcom
 //
 (* ****** ****** *)
-//
-#include
-"share/atspre_staload.hats"
+
+#staload "libats/SATS/gint.sats"
+#staload _ = "libats/DATS/gint.dats"
+
+#staload "libats/SATS/char.sats"
+#staload _ = "libats/DATS/char.dats"
+
+#staload "libats/SATS/gptr.sats"
+#staload _ = "libats/DATS/gptr.dats"
+
+#staload "libats/SATS/list.sats"
+#staload _ = "libats/DATS/list.dats"
+
+#staload "libats/SATS/list_vt.sats"
+#staload _ = "libats/DATS/list_vt.dats"
+
+#staload "libats/SATS/filebas.sats"
+#staload _ = "libats/DATS/filebas.dats"
+
+
 #staload
-UN = "prelude/SATS/unsafe.sats"
-//
+UN = "libats/SATS/unsafe.sats"
+
 (* ****** ****** *)
-//
-#staload
-"./../../xutl/SATS/mylibc.sats"
-//
-(* ****** ****** *)
-//
+
 #staload "./../SATS/lexbuf.sats"
 #staload "./../SATS/lexing.sats"
-//
-#staload "./../SATS/locinfo.sats"
-#staload
-_(*TMP*) = "./../DATS/locinfo.dats"
-//
+
 (* ****** ****** *)
 
 #define OCT 8
@@ -62,18 +70,18 @@ _(*TMP*) = "./../DATS/locinfo.dats"
 //
 extern
 fun
-isEMP(c: char): bool
+isEOL(c: char): bool
 //
 extern
 fun
-isEOL(c: char): bool
+isBLANK(c: char): bool
 //
 extern
 fun
 isDOT(c: char): bool
 extern
 fun
-isCLN(c: char): bool
+isCOLON(c: char): bool
 //
 extern
 fun
@@ -128,7 +136,7 @@ implement
 isEOL(c) = (c = '\n')
 //
 implement
-isEMP(c) =
+isBLANK(c) =
 if
 (c = ' ')
 then true
@@ -139,23 +147,23 @@ else (if (c = '\t') then true else false)
 implement
 isDOT(c) = (c = '.')
 implement
-isCLN(c) = (c = ':')
+isCOLON(c) = (c = ':')
 //
 (* ****** ****** *)
 //
 implement
-isALNUM(c) = isalnum(c)
+isALNUM(c) = char0_isalnum(c)
 implement
-isDIGIT(c) = isdigit(c)
+isDIGIT(c) = char0_isdigit(c)
 implement
-isXDIGIT(c) = isxdigit(c)
+isXDIGIT(c) = char0_isxdigit(c)
 //
 (* ****** ****** *)
 //
 implement
 isALNUM_(c) =
 (
-  isalnum(c) || (c = '_')
+  char0_isalnum(c) || (c = '_')
 )
 //
 (* ****** ****** *)
@@ -164,7 +172,7 @@ implement
 isIDENTFST(c) =
 (
   ifcase
-  | isalpha(c) => true
+  | char0_isalpha(c) => true
   | ( c = '_' ) => true
   | _ (*rest-of-char*) => false
 ) (* end of [isIDENTFST] *)
@@ -173,7 +181,7 @@ implement
 isIDENTRST(c) =
 (
 ifcase
-| isalnum(c) => true
+| char0_isalnum(c) => true
 | ( c = '_' ) => true
 | ( c = '$' ) => true
 | ( c = '\'' ) => true // HX: ML tradition
@@ -195,16 +203,7 @@ SYMBOLIC = "%&+-./:=@~`^|*!?<>#$"
 //
 *)
 in
-//
-found >
-the_null_ptr where
-{
-  val
-  found =
-  xatsopt_strchr
-  (string2ptr(SYMBOLIC), char2int0(c))
-}
-//
+  $extfcall(ptr, "strchr", SYMBOLIC, c) > the_null_ptr
 end // end of [SYMBOLIC_test]
 
 (* ****** ****** *)
@@ -215,8 +214,8 @@ implement
 isSLASH4(cs) =
 (
 0 =
-xatsopt_strncmp
-(string2ptr(cs), string2ptr("////"), i2sz(4))
+$extfcall
+(int, "strncmp", cs, "////", 4)
 ) (* end of [isSLASH4] *)
 
 (* ****** ****** *)
@@ -273,11 +272,11 @@ loop
 (buf:
 &lexbuf >> _, k: int): int = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -300,11 +299,11 @@ implement
 testing_sign_digits
   (buf) = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -334,11 +333,11 @@ loop
 (buf:
 &lexbuf >> _, k: int): int = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -377,7 +376,7 @@ implement
 testing_floatsfx
   (buf, i0) = let
 //
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 ifcase
@@ -399,11 +398,11 @@ loop0
 (buf:
 &lexbuf >> _, k: int): int = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 if
@@ -418,7 +417,7 @@ loop1
 &lexbuf >> _
 , i0: int, k: int): int =
 let
-  val c0 = int2char0(i0)
+  val c0 = char0_chr(i0)
 in
 //
 ifcase
@@ -443,7 +442,7 @@ implement
 testing_floatsfx_hex
   (buf, i0) = let
 //
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -467,11 +466,11 @@ loop0
 (buf:
 &lexbuf >> _, k: int): int = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 if
@@ -486,7 +485,7 @@ loop1
 &lexbuf >> _
 , i0: int, k: int): int = let
 //
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -573,7 +572,7 @@ end (* end of [lexing_isEOL] *)
 (* ****** ****** *)
 
 fun
-lexing_isEMP
+lexing_isBLANK
 ( buf
 : &lexbuf >> _, i0: int
 ) : tnode =
@@ -585,16 +584,16 @@ loop
 (buf:
 &lexbuf >> _): tnode = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
 if
-isEMP(c0)
+isBLANK(c0)
 then loop(buf)
 else let
   val () = lexbuf_unget(buf, i0)
@@ -604,71 +603,7 @@ end // end of [else]
 //
 end // end of [loop]
 //
-} (* end of [lexing_isEMP] *)
-
-(* ****** ****** *)
-
-fun
-lexing_isDOT
-( buf
-: &lexbuf >> _, i0: int
-) : tnode = let
-//
-val i1 = 
-(
-  lexbuf_getc(buf)
-)
-val c1 = int2char0(i1)
-//
-in
-//
-ifcase
-| c1 = '<' =>
-  T_DOTLT(cs) where
-  {
-    val cs =
-    lexbuf_get_fullseg(buf)
-  }
-| _(* else *) => let
-    val () =
-    lexbuf_unget(buf, i1)
-  in
-    lexing_isSYMBOLIC(buf, i0)
-  end (* end of [......] *)
-//
-end (* end of [lexing_isDOT] *)
-
-(* ****** ****** *)
-
-fun
-lexing_isCLN
-( buf
-: &lexbuf >> _, i0: int
-) : tnode = let
-//
-val i1 = 
-(
-  lexbuf_getc(buf)
-)
-val c1 = int2char0(i1)
-//
-in
-//
-ifcase
-| c1 = '<' =>
-  T_CLNLT(cs) where
-  {
-    val cs =
-    lexbuf_get_fullseg(buf)
-  }
-| _(* else *) => let
-    val () =
-    lexbuf_unget(buf, i1)
-  in
-    lexing_isSYMBOLIC(buf, i0)
-  end (* end of [......] *)
-//
-end (* end of [lexing_isCOLON] *)
+} (* end of [lexing_isBLANK] *)
 
 (* ****** ****** *)
 
@@ -678,11 +613,11 @@ lexing_isSLASH
 : &lexbuf >> _, i0: int
 ) : tnode = let
 //
-val i1 = 
+val i1 =
 (
   lexbuf_getc(buf)
 )
-val c1 = int2char0(i1)
+val c1 = char0_chr(i1)
 //
 in
 //
@@ -733,11 +668,11 @@ loop0
 (buf:
 &lexbuf >> _): tnode = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -766,11 +701,11 @@ loop0d
 (buf:
 &lexbuf >> _): tnode = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -798,11 +733,11 @@ loop0x
 (buf:
 &lexbuf >> _): tnode = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -837,11 +772,11 @@ loop1
 (buf:
 &lexbuf >> _): tnode = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -864,7 +799,7 @@ end // end of [loop1]
 
 (* ****** ****** *)
 
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 
 (* ****** ****** *)
 
@@ -883,11 +818,11 @@ loop
 (buf:
 &lexbuf >> _): tnode = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 (*
 val () =
 println!
@@ -925,11 +860,11 @@ loop
 (buf:
 &lexbuf >> _): tnode = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -964,11 +899,11 @@ loop
 (buf:
 &lexbuf >> _, k: int): tnode = let
 //
-val i1 = 
+val i1 =
 (
   lexbuf_getc(buf)
 )
-val c1 = int2char0(i1)
+val c1 = char0_chr(i1)
 //
 in
 //
@@ -1009,19 +944,16 @@ loop
 (buf:
 &lexbuf >> _, k: int): tnode = let
 //
-val i1 = 
+val i1 =
 (
   lexbuf_getc(buf)
 )
-val c1 = int2char0(i1)
+val c1 = char0_chr(i1)
 //
 in
 //
 if
-(*
 isALNUM_(c1)
-*)
-isIDENTRST(c1)
 then
 (
 loop(buf, k+1)
@@ -1063,11 +995,11 @@ lexing_isLPAREN
 : &lexbuf >> _, i0: int
 ) : tnode = let
 //
-val i1 = 
+val i1 =
 (
   lexbuf_getc(buf)
 )
-val c1 = int2char0(i1)
+val c1 = char0_chr(i1)
 //
 in
 //
@@ -1102,11 +1034,11 @@ loop
 (buf:
 &lexbuf >> _): tnode = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -1122,17 +1054,17 @@ loop1
 (buf:
 &lexbuf >> _): tnode = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
 ifcase
-| isdigit(c0) => loop11(buf)
-| isprint(c0) => loop12(buf)
+| char0_isdigit(c0) => loop11(buf)
+| char0_isprint(c0) => loop12(buf)
 | _ (* else *) => loop12(buf)
 //
 end // end of [loop1]
@@ -1148,11 +1080,11 @@ and
 loop3
 (buf:
 &lexbuf >> _): tnode = let
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -1175,17 +1107,17 @@ loop11
 (buf:
 &lexbuf >> _): tnode = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
 ifcase
 //
-| isdigit(c0) => loop11(buf)
+| char0_isdigit(c0) => loop11(buf)
 //
 | isSQUOTE(c0) =>
   T_CHAR_slash
@@ -1203,11 +1135,11 @@ and
 loop12
 (buf:
 &lexbuf >> _): tnode = let
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -1240,11 +1172,11 @@ loop
 (buf:
 &lexbuf >> _): tnode = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 (*
 val () = println! ("i0 = ", i0)
@@ -1254,19 +1186,19 @@ in
 //
 ifcase
 | c0 = '\"' =>
-  T_STRING_closed
+  T_STRING_closed//unclsd
   (lexbuf_get_fullseg(buf))
 | c0 = '\\' =>
   loop(buf) where
   {
-    val i0 = lexbuf_getc(buf)
+  val i0 = lexbuf_getc(buf)
   } (* end of [......] *)
 | _(* else *) =>
   if
   (i0 >= 0)
   then loop(buf)
   else
-  T_STRING_unclsd(lexbuf_get_fullseg(buf))
+  T_STRING_unclsd(* closed *)(lexbuf_get_fullseg(buf))
 //
 end // end of [loop]
 //
@@ -1279,11 +1211,11 @@ in (* in-of-local *)
 implement
 lexing_tnode(buf) = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 (*
 val () =
@@ -1296,17 +1228,11 @@ in
 //
 ifcase
 //
-| isEMP(c0) =>
-  lexing_isEMP(buf, i0)
-//
 | isEOL(c0) =>
   lexing_isEOL(buf, i0)
 //
-| isDOT(c0) =>
-  lexing_isDOT(buf, i0)
-//
-| isCLN(c0) =>
-  lexing_isCLN(buf, i0)
+| isBLANK(c0) =>
+  lexing_isBLANK(buf, i0)
 //
 | isSLASH(c0) =>
   lexing_isSLASH(buf, i0)
@@ -1364,11 +1290,11 @@ loop0
 (buf:
 &lexbuf >> _): tnode = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
   if
@@ -1394,11 +1320,11 @@ loop0
 (buf:
 &lexbuf >> _): tnode = let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
   if
@@ -1436,11 +1362,11 @@ if
 (lvl > 0)
 then let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -1467,11 +1393,11 @@ loop1
 (buf:
 &lexbuf >> _, lvl: int): tnode = let
 //
-val i1 = 
+val i1 =
 (
   lexbuf_getc(buf)
 )
-val c1 = int2char0(i1)
+val c1 = char0_chr(i1)
 //
 in
 //
@@ -1500,11 +1426,11 @@ if
 (lvl > 0)
 then let
 //
-val i0 = 
+val i0 =
 (
   lexbuf_getc(buf)
 )
-val c0 = int2char0(i0)
+val c0 = char0_chr(i0)
 //
 in
 //
@@ -1533,11 +1459,11 @@ loop1
 (buf:
 &lexbuf >> _, lvl: int): tnode = let
 //
-val i1 = 
+val i1 =
 (
   lexbuf_getc(buf)
 )
-val c1 = int2char0(i1)
+val c1 = char0_chr(i1)
 //
 in
 //
@@ -1553,11 +1479,11 @@ loop2
 (buf:
 &lexbuf >> _, lvl: int): tnode = let
 //
-val i1 = 
+val i1 =
 (
   lexbuf_getc(buf)
 )
-val c1 = int2char0(i1)
+val c1 = char0_chr(i1)
 //
 in
 //
@@ -1584,18 +1510,18 @@ fpath_tokenize
 //
 val
 opt =
-fileref_open_opt
-  (fpath, file_mode_r)
+FILEref_open_opt
+  (fpath, "r"(* file_mode_r *))
 //
 in
   case+ opt of
-  | ~None_vt() =>
+  | ~optn0_vt_none() =>
     (
-      None_vt()
+      optn1_vt_none()
     )
-  | ~Some_vt(inp) =>
+  | ~optn0_vt_some(inp) =>
     (
-      Some_vt(fileref_tokenize(inp))
+      optn1_vt_some(fileref_tokenize(inp))
     )
 end // end of [fpath_tokenize]
 
@@ -1604,11 +1530,11 @@ end // end of [fpath_tokenize]
 local
 
 #staload
-"./../../xutl/SATS/cblist.sats"
+"./../../util/SATS/cblist.sats"
 #staload
-"./../../xutl/SATS/Posix/cblist.sats"
+"./../../util/SATS/Posix/cblist.sats"
 #staload _ =
-"./../../xutl/DATS/Posix/cblist.dats"
+"./../../util/DATS/Posix/cblist.dats"
 
 in (* in-of-local *)
 
@@ -1634,11 +1560,11 @@ in
   case+ tnd of
   | T_EOF() =>
     (
-      list_vt_cons(tnd, res)
+      list1_vt_cons(tnd, res)
     )
   | _(*non-EOF*) =>
     ( loop
-      (buf, list_vt_cons(tnd, res))
+      (buf, list1_vt_cons(tnd, res))
     )
 end // end of [loop]
 //
@@ -1646,7 +1572,7 @@ var buf: lexbuf
 //
 val cbs = string2cblist(inp)
 val (_) = lexbuf_initize_cblist(buf, cbs)
-val tnds = loop(buf, list_vt_nil(*void*))
+val tnds = loop(buf, list1_vt_nil(*void*))
 //
 in
 //
@@ -1655,14 +1581,15 @@ toks where
 //
 var pos0: pos_t
 //
-val tnds = list_vt_reverse(tnds)
+extern castfn ofg0{a:tflt}(list0_vt(a)) : [n:int | n >= 0] list1_vt(a, n)
+  val tnds = ofg0(list0_vt_reverse(g0ofg1 tnds))
 //
 val ((*void*)) =
   $LOC.position_initize(pos0, 0, 0, 0)
 val toks =
-  lexing_locatize_nodelst(pos0, $UN.list_vt2t(tnds))
+  lexing_locatize_nodelst(pos0, list1_vt2t(tnds))
 //
-val ((*freed*)) = list_vt_free(tnds)
+(* val ((*freed*)) = list0_vt_free(g0ofg1 tnds) *)
 //
 } (* end of [where] *)
 end // end of [string_tokenize]
@@ -1688,18 +1615,18 @@ in
   case+ tnd of
   | T_EOF() =>
     (
-      list_vt_cons(tnd, res)
+      list1_vt_cons(tnd, res)
     )
   | _(*non-EOF*) =>
     ( loop
-      (buf, list_vt_cons(tnd, res))
+      (buf, list1_vt_cons(tnd, res))
     )
 end // end of [loop]
 //
 var buf: lexbuf
 //
 val-
-~Some_vt(cbs) =
+~optn1_vt_some(cbs) =
 (
   fileref_get_cblist_vt(inp, BSZ)
 )
@@ -1708,7 +1635,7 @@ local
 val cbs = $UN.castvwtp1(cbs)
 val (_) = lexbuf_initize_cblist(buf, cbs)
 in
-val tnds = loop(buf, list_vt_nil(*void*))
+val tnds = loop(buf, list1_vt_nil(*void*))
 //
 end // end of [local]
 //
@@ -1720,14 +1647,16 @@ toks where
 var pos0: pos_t
 //
 val () = cblist_vt_free(cbs)
-val tnds = list_vt_reverse(tnds)
+val tnds = list0_vt_reverse(g0ofg1 tnds)
 //
 val ((*void*)) =
   $LOC.position_initize(pos0, 0, 0, 0)
+extern castfn ofg0{a:tflt}(list0_vt(a)) : [n:int | n >= 0] list1_vt(a, n)
+val nxt = list1_vt2t(ofg0(tnds))
 val toks =
-  lexing_locatize_nodelst(pos0, $UN.list_vt2t(tnds))
+  lexing_locatize_nodelst(pos0, nxt) //$UN.list1_vt2t(g1ofg0(tnds)))
 //
-val ((*freed*)) = list_vt_free(tnds)
+(* val ((*freed*)) = list0_vt_free(tnds) *)
 //
 } (* end of [where] *)
 end // end of [fileref_tokenize]

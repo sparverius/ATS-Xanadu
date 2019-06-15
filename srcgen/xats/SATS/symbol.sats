@@ -5,7 +5,7 @@
 (***********************************************************************)
 
 (*
-** ATS/Xanadu - Unleashing the Potential of Types!
+** ATS/Postiats - Unleashing the Potential of Types!
 ** Copyright (C) 2018 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
@@ -13,12 +13,12 @@
 ** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
 ** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-** 
+**
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-** 
+**
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -35,24 +35,19 @@
 
 #staload "./basics.sats"
 
+#include "./share.sats"
+
 (* ****** ****** *)
 //
-abstbox symbol_tbox = ptr
-//
-typedef sym_t = symbol_tbox
+abstbox symbol_tbox // boxed
 //
 typedef symbol = symbol_tbox
+typedef symbolist = list1_0(symbol)
+typedef symbolopt = optn1(symbol)
 //
-typedef
-symbolist = List0(symbol)
-typedef
-symbolopt = Option(symbol)
-//
-vtypedef
-symbolist_vt = List0_vt(symbol)
-vtypedef
-symbolopt_vt = Option_vt(symbol)
-//
+vtypedef symbolist_vt = list1_0_vt(symbol)
+vtypedef symbolopt_vt = optn1_vt(symbol)
+
 (* ****** ****** *)
 
 val symbol_nil : symbol // SYMBOL("")
@@ -65,28 +60,28 @@ val CLN_symbol : symbol // symbol(":")
 //
 (* ****** ****** *)
 //
-val ADD_symbol : symbol // SYMBOL("+")
-val SUB_symbol : symbol // SYMBOL("-")
-val MUL_symbol : symbol // SYMBOL("*")
-val DIV_symbol : symbol // SYMBOL("/")
+val symbol_ADD : symbol // SYMBOL("+")
+val symbol_SUB : symbol // SYMBOL("-")
+val symbol_MUL : symbol // SYMBOL("*")
+val symbol_DIV : symbol // SYMBOL("/")
 //
 (* ****** ****** *)
 //
-val LT_symbol : symbol // SYMBOL("<")
-val GT_symbol : symbol // SYMBOL(">")
-val LTEQ_symbol : symbol // SYMBOL("<=")
-val GTEQ_symbol : symbol // SYMBOL(">=")
+val symbol_LT : symbol // SYMBOL("<")
+val symbol_GT : symbol // SYMBOL(">")
+val symbol_LTEQ : symbol // SYMBOL("<=")
+val symbol_GTEQ : symbol // SYMBOL(">=")
 //
 (* ****** ****** *)
 //
-val EQ_symbol : symbol // SYMBOL("=")
+val symbol_EQ : symbol // SYMBOL("=")
 //
-val EQEQ_symbol : symbol // SYMBOL("==")
-val LTGT_symbol : symbol // SYMBOL("<>")
-val BANGEQ_symbol : symbol // SYMBOL("!=")
+val symbol_EQEQ : symbol // SYMBOL("==")
+val symbol_LTGT : symbol // SYMBOL("<>")
+val symbol_BANGEQ : symbol // SYMBOL("!=")
 //
 (* ****** ****** *)
-//
+
 val EQLT_symbol : symbol // SYMBOL("=<")
 val EQGT_symbol : symbol // SYMBOL("=>")
 //
@@ -148,7 +143,13 @@ val DLR_EXTYPE_symbol : symbol // $extype
 //
 val STDIN_fp_symbol : symbol // SYMBOL("__STDIN__")
 val STRING_fp_symbol : symbol // SYMBOL("__STRING__")
-//
+
+
+(* ****** ****** *)
+
+val symbol__STDIN__ : symbol // SYMBOL("__STDIN__")
+val symbol__STRING__ : symbol // SYMBOL("__STRING__")
+
 (* ****** ****** *)
 //
 fun
@@ -161,21 +162,25 @@ symbol_get_name(symbol):<> string
 fun
 symbol_get_stamp(x: symbol):<> uint
 //
-overload .name with symbol_get_name
-overload .stamp with symbol_get_stamp
+#symload .name with symbol_get_name
+#symload .stamp with symbol_get_stamp
 //
 (* ****** ****** *)
 //
 fun
 print_symbol : (symbol) -> void
+(*
 fun
 prerr_symbol : (symbol) -> void
 fun
 fprint_symbol : (FILEref, symbol) -> void
+*)
 //
-overload print with print_symbol
-overload prerr with prerr_symbol
-overload fprint with fprint_symbol
+#symload print with print_symbol
+(*
+#symload prerr with prerr_symbol
+#symload fprint with fprint_symbol
+*)
 //
 (* ****** ****** *)
 //
@@ -188,18 +193,18 @@ fun neq_symbol_symbol: neq_type(symbol)
 fun
 compare_symbol_symbol: compare_type(symbol)
 //
-overload = with eq_symbol_symbol
-overload != with neq_symbol_symbol
+#symload = with eq_symbol_symbol
+#symload != with neq_symbol_symbol
 //
-overload iseqz with symbol_is_nil
-overload isneqz with symbol_isnot_nil
+#symload iseqz with symbol_is_nil
+#symload isneqz with symbol_isnot_nil
 //
-overload compare with compare_symbol_symbol
+#symload compare with compare_symbol_symbol
 //
 (* ****** ****** *)
-//
+
 fun stamp_to_symbol(stamp: uint): symbolopt_vt
-//
+
 (* ****** ****** *)
 
 (* end of [xats_symbol.sats] *)

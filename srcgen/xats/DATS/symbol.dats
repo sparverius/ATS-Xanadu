@@ -5,7 +5,7 @@
 (***********************************************************************)
 
 (*
-** ATS/Xanadu - Unleashing the Potential of Types!
+** ATS/Postiats - Unleashing the Potential of Types!
 ** Copyright (C) 2018 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
@@ -13,12 +13,12 @@
 ** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
 ** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-** 
+**
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-** 
+**
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -32,71 +32,26 @@
 // Authoremail: gmhwxiATgmailDOTcom
 //
 (* ****** ****** *)
-//
-#include
-"share/atspre_staload.hats"
+
+#staload "libats/SATS/stdio.sats"
+#staload _ = "libats/DATS/stdio.dats"
+
+#staload "libats/SATS/print.sats"
+#staload _ = "libats/DATS/print.dats"
+
+#staload "libats/SATS/gint.sats"
+#staload _ = "libats/DATS/gint.dats"
+
+#staload "libats/SATS/gref.sats"
+#staload _ = "libats/DATS/gref.dats"
+
+
 #staload
-UN = "prelude/SATS/unsafe.sats"
-//
+UN = "libats/SATS/unsafe.sats"
+
 (* ****** ****** *)
 
 #staload "./../SATS/symbol.sats"
-
-(* ****** ****** *)
-
-local
-
-#staload "libats/SATS/dynarray.sats"
-#staload _ = "libats/DATS/dynarray.dats"
-
-typedef itm = symbol
-vtypedef
-dynarray = dynarray(itm)
-
-val
-theCap = 1024
-val
-theDynarr = 
-dynarray_make_nil<itm>(i2sz(theCap))
-val
-theDynarr = $UN.castvwtp0{ptr}(theDynarr)
-
-in (* in-of-local *)
-
-static
-fun
-stamp_insert(symbol): void
-
-implement
-stamp_insert
-  (sym) = let
-  val i0 =
-  u2sz(g1ofg0(sym.stamp()))
-  val A0 =
-  $UN.castvwtp0{dynarray}(theDynarr)
-  val-
-  ~None_vt() =
-  dynarray_insert_at_opt(A0, i0, sym)
-  prval ((*void*)) = $UN.cast2void(A0)
-in
-  // nothing
-end // end of [stamp_insert]
-
-implement
-stamp_to_symbol
-  (stamp) = let
-  val i0 = u2sz(g1ofg0(stamp))
-  val A0 =
-  $UN.castvwtp0{dynarray}(theDynarr)
-  val cp = dynarray_getref_at(A0, i0)
-  prval ((*void*)) = $UN.cast2void(A0)
-in
-  if
-  isneqz(cp)
-  then Some_vt($UN.cptr_get(cp)) else None_vt()
-end // end of [stamp_to_symbol]
-
-end // end of [local]
 
 (* ****** ****** *)
 
@@ -117,7 +72,7 @@ local
 
 absimpl
 symbol_tbox = $rec{
-  name= string, stamp= uint
+  name= string0, stamp= uint
 } (* end of [symbol_tbox] *)
 
 (* ****** ****** *)
@@ -154,10 +109,7 @@ case+ ans of
     $rec{name=name,stamp=stm}
     prval ((*void*)) = opt_unnone(res)
   in
-    let
-      val () = stamp_insert(sym)
-      val () = symbol_insert(sym) in sym
-    end
+    let val () = symbol_insert(sym) in sym end
   end (* end of [false] *)
 //
 end // end of [symbol_make]
@@ -184,7 +136,7 @@ neq_symbol_symbol(x, y) =
 //
 implement
 compare_symbol_symbol(x, y) =
-  compare(x.stamp(), y.stamp())
+  g0cmp_uint_uint(x.stamp(), y.stamp())
 //
 (* ****** ****** *)
 //
@@ -197,6 +149,15 @@ symbol_isnot_nil(x) = (x != symbol_nil)
 
 local
 //
+#staload "libats/temp/SATS/hashmap_chain.sats"
+//
+#staload _(*anon*) = "libats/DATS/qlist.dats"
+//
+#staload _(*anon*) = "libats/temp/DATS/hashfun.dats"
+#staload _(*anon*) = "libats/temp/DATS/linmap_list.dats"
+#staload _(*anon*) = "libats/temp/DATS/hashmap_chain.dats"
+
+(*
 #staload "libats/SATS/hashtbl_chain.sats"
 //
 #staload _(*anon*) = "libats/DATS/qlist.dats"
@@ -204,17 +165,17 @@ local
 #staload _(*anon*) = "libats/DATS/hashfun.dats"
 #staload _(*anon*) = "libats/DATS/linmap_list.dats"
 #staload _(*anon*) = "libats/DATS/hashtbl_chain.dats"
+*)
 //
 typedef key = string
 typedef itm = symbol
-//
-vtypedef hashtbl = hashtbl(key, itm)
+vtypedef hashtbl = hashmap(key, itm)
 //
 val
 theCap = 1024
 val
-theHashtbl = 
-hashtbl_make_nil<key,itm>(i2sz(theCap))
+theHashtbl =
+hashmap_make_hcap(i2sz(theCap))
 val
 theHashtbl = $UN.castvwtp0{ptr}(theHashtbl)
 //
@@ -231,7 +192,7 @@ val tbl =
 //
 var res: itm?
 val ans =
-  hashtbl_insert<key,itm>(tbl, key, sym, res)
+  hashmap_insert<key,itm>(tbl, key, sym, res)
 //
 prval ((*void*)) = opt_clear(res)
 prval ((*void*)) = $UN.cast2void(tbl)
@@ -249,7 +210,7 @@ symbol_search
 val tbl =
   $UN.castvwtp0{hashtbl}(theHashtbl)
 val ans =
-  hashtbl_search<key,itm>(tbl, name, res)
+  hashmap_search<key,itm>(tbl, name, res)
 //
 in
   let prval ((*void*)) = $UN.cast2void(tbl) in ans end
@@ -259,27 +220,17 @@ end // end of [local]
 
 (* ****** ****** *)
 //
-implement
-print_symbol
-  (sym) =
-fprint_symbol(stdout_ref, sym)
-implement
-prerr_symbol
-  (sym) =
-fprint_symbol(stderr_ref, sym)
-//
-implement
-fprint_symbol
-  (out, x0) = fprint!(out, x0.name())
 (*
 implement
-fprint_symbol
-  (out, x0) =
-(
-  fprint!
-  (out, x0.name(), "(", x0.stamp(), ")")
-)
+print_symbol
+  (x) = fprint_symbol(stdout_ref, x)
+implement
+prerr_symbol
+  (x) = fprint_symbol(stderr_ref, x)
 *)
+//
+implement
+print_symbol(x) = print!(x.name(), "(", x.stamp(), ")")
 //
 (* ****** ****** *)
 
@@ -298,38 +249,38 @@ CLN_symbol = symbol_make(":")
 (* ****** ****** *)
 
 implement
-ADD_symbol = symbol_make("+")
+symbol_ADD = symbol_make("+")
 implement
-SUB_symbol = symbol_make("-")
+symbol_SUB = symbol_make("-")
 implement
-MUL_symbol = symbol_make("*")
+symbol_MUL = symbol_make("*")
 implement
-DIV_symbol = symbol_make("/")
+symbol_DIV = symbol_make("/")
 
 (* ****** ****** *)
 
 implement
-LT_symbol = symbol_make("<")
+symbol_LT = symbol_make("<")
 implement
-GT_symbol = symbol_make(">")
+symbol_GT = symbol_make(">")
 implement
-LTEQ_symbol = symbol_make("<=")
+symbol_LTEQ = symbol_make("<=")
 implement
-GTEQ_symbol = symbol_make(">=")
+symbol_GTEQ = symbol_make(">=")
 
 (* ****** ****** *)
 
 implement
-EQ_symbol = symbol_make("=")
+symbol_EQ = symbol_make("=")
 implement
-EQEQ_symbol = symbol_make("==")
+symbol_EQEQ = symbol_make("==")
 implement
-LTGT_symbol = symbol_make("<>")
+symbol_LTGT = symbol_make("<>")
 implement
-BANGEQ_symbol = symbol_make("!=")
+symbol_BANGEQ = symbol_make("!=")
 
 (* ****** ****** *)
-//
+
 implement
 EQLT_symbol = symbol_make("=<")
 implement
@@ -417,9 +368,9 @@ DLR_EXTYPE_symbol = symbol_make("$extype")
 (* ****** ****** *)
 
 implement
-STDIN_fp_symbol = symbol_make("__STDIN__")
+symbol__STDIN__ = symbol_make("__STDIN__")
 implement
-STRING_fp_symbol = symbol_make("__STRING__")
+symbol__STRING__ = symbol_make("__STRING__")
 
 (* ****** ****** *)
 

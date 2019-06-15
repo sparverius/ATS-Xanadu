@@ -5,8 +5,8 @@
 (***********************************************************************)
 
 (*
-** ATS/Xanadu - Unleashing the Potential of Types!
-** Copyright (C) 2018 Hongwei Xi, ATS Trustful Software, Inc.
+** ATS/Postiats - Unleashing the Potential of Types!
+** Copyright (C) 2011-2014 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
@@ -28,7 +28,7 @@
 (* ****** ****** *)
 //
 // Author: Hongwei Xi
-// Authoremail: gmhwxiATgmailDOTcom
+// Authoremail: hwxiATcsDOTbuDOTedu
 //
 // This one was
 // there at the very beginning of ATS
@@ -36,16 +36,13 @@
 (* ****** ****** *)
 //
 (*
-HX-2018-10:
-fixity declarations
-#include "prelude/xparam.hats"
+HX: fixity declarations
 *)
+#include "prelude/params.hats"
 //
 (* ****** ****** *)
 
-#if
-VERBOSE_FIXITY
-#then
+#if VERBOSE_FIXITY #then
 #print \
 "Loading [fixity.ats] starts!\n"
 #endif // end of [VERBOSE_FIXITY]
@@ -53,35 +50,40 @@ VERBOSE_FIXITY
 (* ****** ****** *)
 //
 (*
-#prefix ! of 00 (* static *)
+prefix 00 ! (* static *)
 *)
 //
-#prefix ! of 99 (* dynamic *)
+prefix 99 ! (* dynamic *)
 //
 (* ****** ****** *)
 
 (*
-#postfix .lab of 80 // dynamic
-#postfix ->lab of 80 // dynamic
+prefix 81 ID (* identity *)
 *)
 
 (* ****** ****** *)
 
 (*
-#prefix & of 79 // dynamic
+postfix 80 .lab // dynamic
+postfix 80 ->lab // dynamic
 *)
 
 (* ****** ****** *)
 
 (*
-#infixl
-app of 70 // the app_prcdv
+prefix 79 & // dynamic
 *)
 
 (* ****** ****** *)
 
 (*
-#postfix ? of 69 // static?
+infixl 70 app
+*)
+
+(* ****** ****** *)
+
+(*
+postfix 69 ?
 *)
 
 (* ****** ****** *)
@@ -89,93 +91,109 @@ app of 70 // the app_prcdv
 // HX-2015-08-04:
 // mostly following the Fortran convention
 //
-#infixr ** of 61 (*exp*)
+infixr 61 ** (*exp*)
 //
 (* ****** ****** *)
 //
 // multiplicative
 //
-#infixl * / % mod of 60
+infixl 60 * / % mod
 //
 (*
-#infixl nmul ndiv nmod of 60
+infixl 60 nmul ndiv nmod
 *)
 //
 (* ****** ****** *)
 
-#prefix ~ of 51 (*negative*)
+prefix 51 ~ (*negative*)
 
 (* ****** ****** *)
 //
-#infixl + - of 50 (*additive*)
-//
-#prefix + of +(+1) (* uplus *)
-#prefix - of -(+1) (* uminus *)
+infixl 50 + - (*additive*)
 //
 (*
-#infixr (+) ++ // concatenative
+infixr (+) ++ // concatenative
 *)
 //
 (* ****** ****** *)
 
-#infixl asl asr of 41
-#infixl lsl lsr of 41 
+infixl 41 asl asr
+infixl 41 lsl lsr
 
 (* ****** ****** *)
 //
-#infixr :: @ of 40
-#infix0 < <= > >= of 40
+infix 40 < <= > >=
+//
+(*
+//
+// HX-2012-07: removed
+//
+infixl ( < ) ilt flt plt ult
+infixl ( <= ) ilte flte plte ulte
+infixl ( > ) igt fgt pgt ugt
+infixl ( >= ) igte fgte pgte ugte
+*)
 //
 (* ****** ****** *)
 
-#infix0 = != == !== of 30
+infixr 40 :: @
 
 (* ****** ****** *)
 
-#infixl || of 20
-#infixl && of ||(+1)
-
-#infixl andalso land of &&
-#infixl orelse xor lor lxor of ||
-
-(* ****** ****** *)
-
-#infixr -> of 10
-
-(* ****** ****** *)
-
-#infix0 := of 0 // HX: assign
-#infix0 :=: of 0 // HX: exchange
-
-(* ****** ****** *)
-
-#infixl << of 0 (* asl/lsl *)
-#infixr >> of 0 (* asr/lsr *)
+infix 30 = == != <>
 
 (* ****** ****** *)
 
 (*
-#prefix ++ -- // inc and dec
-#prefix !++ --! // getinc and decget
-#infixr =++ --= // setinc and decset
+//
+// HX-2012-07: removed
+//
+infix ( = ) ieq feq peq ueq
+infix ( <> ) ineq fneq pneq uneq
 *)
 
 (* ****** ****** *)
 
-(*
-#infix0 :+= :-= :*= :/= // x:=x+a, x:=x-a, ...
-#infix0 :=+ :=- :=* :=/ // x:=a+x, x:=a-x, ...
-*)
+infixl 21 &&
+infixl ( && ) andalso land
 
 (* ****** ****** *)
 
-#prefix ignoret of 0 // ignoring a funcall return
+infixl 20 ||
+infixl ( || ) xor orelse lor lxor
 
 (* ****** ****** *)
 
-#if
-VERBOSE_FIXITY
-#then
+infixr 10 ->
+
+(* ****** ****** *)
+
+infix 0 := // HX: assign
+infix 0 :=: // HX: exchange
+
+(* ****** ****** *)
+
+infixl 0 << (* g0int_asl, g0uint_lsl *)
+infixr 0 >> (* g0int_asr, g0uint_lsr *)
+
+(* ****** ****** *)
+
+prefix 0 ++ -- // inc and dec
+prefix 0 !++ --! // getinc and decget
+infixr 0 =++ --= // setinc and decset
+
+(* ****** ****** *)
+
+infix 0 :+= :-= :*= :/= // x:=x+a, x:=x-a, ...
+infix 0 :=+ :=- :=* :=/ // x:=a+x, x:=a-x, ...
+
+(* ****** ****** *)
+
+prefix 0 ignoret // ignoring a funcall return
+
+(* ****** ****** *)
+
+#if VERBOSE_FIXITY #then
 #print \
 "Loading [fixity.ats] is done!\n"
 #endif // end of [VERBOSE_FIXITY]

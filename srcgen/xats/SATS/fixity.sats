@@ -5,7 +5,7 @@
 (***********************************************************************)
 
 (*
-** ATS/Xanadu - Unleashing the Potential of Types!
+** ATS/Postiats - Unleashing the Potential of Types!
 ** Copyright (C) 2018 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
@@ -13,12 +13,12 @@
 ** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
 ** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-** 
+**
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-** 
+**
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -32,9 +32,13 @@
 // Authoremail: gmhwxiATgmailDOTcom
 //
 (* ****** ****** *)
+
+
+#include "./share.sats"
+
 //
 #staload
-LOC = "./locinfo.sats"
+LOC = "./location.sats"
 //
   typedef loc_t = $LOC.loc_t
 //
@@ -51,15 +55,15 @@ prerr_assoc(assoc): void
 fun
 fprint_assoc: fprint_type(assoc)
 //
-overload print with print_assoc
-overload prerr with prerr_assoc
-overload fprint with fprint_assoc
+#symload print with print_assoc
+#symload prerr with prerr_assoc
+#symload fprint with fprint_assoc
 //
 (* ****** ****** *)
 //
 // HX: precedence value
 //
-abstflat prcdv_tflat = int
+abstflt prcdv_tflat = int
 //
   typedef prcdv = prcdv_tflat
 //
@@ -77,9 +81,9 @@ prerr_prcdv(prcdv): void
 fun
 fprint_prcdv: fprint_type(prcdv)
 //
-overload print with print_prcdv
-overload prerr with prerr_prcdv
-overload fprint with fprint_prcdv
+#symload print with print_prcdv
+#symload prerr with prerr_prcdv
+#symload fprint with fprint_prcdv
 //
 (* ****** ****** *)
 //
@@ -88,13 +92,13 @@ add_prcdv_int(prcdv, int): prcdv
 and
 sub_prcdv_int(prcdv, int): prcdv
 //
-overload + with add_prcdv_int
-overload - with sub_prcdv_int
+#symload + with add_prcdv_int
+#symload - with sub_prcdv_int
 //
 fun
 compare_prcdv_prcdv: (prcdv, prcdv) -> int
 //
-overload compare with compare_prcdv_prcdv
+#symload compare with compare_prcdv_prcdv
 //
 (* ****** ****** *)
 //
@@ -105,13 +109,9 @@ the_posinf_prcdv: prcdv // highest precedence value
 //
 (* ****** ****** *)
 //
-val app_assoc : assoc
 val app_prcdv : prcdv
 //
-val imp_assoc : assoc
-val imp_prcdv : prcdv
-//
-val dtsel_prcdv : prcdv
+val select_prcdv : prcdv
 //
 val exists_prcdv : prcdv
 and forall_prcdv : prcdv
@@ -129,115 +129,38 @@ fixty =
 | FIXTYpre of prcdv
 | FIXTYpos of prcdv
 | FIXTYinf of (prcdv, assoc)
-//
 | FIXTYpreinf of (prcdv, prcdv, assoc)
 (*
 | FIXTYposinf of (prcdv, prcdv, assoc)
 *)
-//
 // end of [fixty]
 //
 (* ****** ****** *)
 //
-val app_fixty : fixty
-//
-val imp_fixty : fixty
-//
-val dtsel_fixty : fixty
-//
-val forall_fixty : fixty
-val exists_fixty : fixty
-//
-val postplus_fixty : fixty
-val postmnus_fixty : fixty
-//
-val backslash_fixty : fixty
-val infixtemp_fixty : fixty
-//
-(* ****** ****** *)
-//
 fun
-print_fixty(fixty): void
+print_fixty (fixty): void
 fun
-prerr_fixty(fixty): void
+prerr_fixty (fixty): void
 fun
 fprint_fixty: fprint_type(fixty)
 //
-overload print with print_fixty
-overload prerr with prerr_fixty
-overload fprint with fprint_fixty
-//
-(* ****** ****** *)
-//
-fun
-fixty_prcdv(fixty): prcdv
-fun
-fixty_assoc(fixty): assoc
+#symload print with print_fixty
+#symload prerr with prerr_fixty
+#symload fprint with fprint_fixty
 //
 (* ****** ****** *)
 //
 datatype
-fxitm(a:type) =
-| FXITMatm(a) of (a)
-| FXITMopr(a) of (a, fixty)
+fxitm(a:tflt) =
+| FXITMatm(a) of a
+| FXITMopr(a) of (loc_t, fxopr(a))
 //
-(* ****** ****** *)
-//
-vtypedef
-fxitmlst(a:type) = List0(fxitm(a))
-//
-(* ****** ****** *)
-//
-fun
-fxopr_prcdv{a:type}(fxitm(a)): prcdv
-fun
-fxopr_assoc{a:type}(fxitm(a)): assoc
-//
-(* ****** ****** *)
-//
-fun
-{a:type}
-fxatm_none: loc_t -> (a)
-fun
-{a:type}
-fxopr_get_loc: (a) -> loc_t
-//
-fun
-{a:type}
-fxitm_get_loc: fxitm(a) -> loc_t
-//
-(* ****** ****** *)
-//
-(*
-fun
-{a:type}
-fxitm_make(x0: a): fxitm(a)
-*)
-//
-fun
-{a:type}
-fxopr_make_app(y0: fxitm(a)): fxitm(a)
-//
-(* ****** ****** *)
-//
-fun
-{a:type}
-fxitmlst_resolve
-  (loc0: loc_t, xs: fxitmlst(a)): (a)
-//
-(* ****** ****** *)
-//
-fun
-{a:type}
-fxitm_infix
-(x0: a, f1: a, x2: a): fxitm(a) // f0(x1,x2)
-//
-fun
-{a:type}
-fxitm_prefix(f0: a, x1: a): fxitm(a) // f0(x1)
-fun
-{a:type}
-fxitm_postfix(x0: a, f1: a): fxitm(a) // f1(x0)
+and
+fxopr(a:tflt) =
+| FXOPRinf(a) of
+  (prcdv, assoc, (a, a) -<cloref1> fxitm(a))
+| FXOPRpre(a) of (prcdv, a -<cloref1> fxitm(a))
+| FXOPRpos(a) of (prcdv, a -<cloref1> fxitm(a))
 //
 (* ****** ****** *)
 

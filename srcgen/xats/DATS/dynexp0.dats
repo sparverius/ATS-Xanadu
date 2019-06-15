@@ -5,7 +5,7 @@
 (***********************************************************************)
 
 (*
-** ATS/Xanadu - Unleashing the Potential of Types!
+** ATS/Postiats - Unleashing the Potential of Types!
 ** Copyright (C) 2018 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
@@ -13,12 +13,12 @@
 ** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
 ** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-** 
+**
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-** 
+**
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -33,16 +33,15 @@
 //
 (* ****** ****** *)
 //
-#include
-"share/atspre_staload.hats"
 #staload
-UN = "prelude/SATS/unsafe.sats"
+UN =
+"libats/SATS/unsafe.sats"
 //
 (* ****** ****** *)
-//
+
 #staload "./../SATS/label0.sats"
-#staload "./../SATS/locinfo.sats"
-//
+#staload "./../SATS/location.sats"
+
 (* ****** ****** *)
 //
 #staload "./../SATS/lexing.sats"
@@ -299,15 +298,15 @@ d0pat_anno_opt
 (d0p, opt) =
 (
 case+ opt of
-| None() => d0p
-| Some(s0e) => let
+| optn1_none() => d0p
+| optn1_some(s0e) => let
     val
     loc = d0p.loc()+s0e.loc()
   in
     d0pat_make_node
       (loc, D0Panno(d0p, s0e))
     // d0pat_make_node
-  end (* end of [Some] *)
+  end (* end of [optn1_some] *)
 ) (* end of [d0pat_anno_opt] *)
 
 implement
@@ -331,7 +330,7 @@ case+ x0 of
 | d0pat_RPAREN_cons1
     (tok1, d0ps, tok2) => tok1.loc() + tok2.loc()
   // d0pat_RPAREN_cons1
-)  
+)
 //
 (* ****** ****** *)
 
@@ -357,15 +356,15 @@ d0exp_anno_opt
 (d0e, opt) =
 (
 case+ opt of
-| None() => d0e
-| Some(s0e) => let
+| optn1_none() => d0e
+| optn1_some(s0e) => let
     val
     loc = d0e.loc()+s0e.loc()
   in
     d0exp_make_node
       (loc, D0Eanno(d0e, s0e))
     // d0exp_make_node
-  end (* end of [Some] *)
+  end (* end of [optn1_some] *)
 ) (* end of [d0exp_anno_opt] *)
 
 implement
@@ -392,7 +391,7 @@ case+ x0 of
 | d0exp_RPAREN_cons2
     (tok1, d0es, tok2) => tok1.loc() + tok2.loc()
   // d0exp_RPAREN_cons1
-)  
+)
 //
 (* ****** ****** *)
 //
@@ -406,7 +405,7 @@ case+ x0 of
 | labd0exp_RBRACE_cons1
     (tok1, ld0es, tok2) => tok1.loc() + tok2.loc()
   // labd0exp_RBRACE_cons1
-)  
+)
 //
 (* ****** ****** *)
 
@@ -556,10 +555,62 @@ case+ x0 of
     (tok1, opt2) =>
   (
     case+ opt2 of
-    | None() => tok1.loc()
-    | Some(tok2) => tok1.loc() + tok2.loc()
+    | optn1_none() => tok1.loc()
+    | optn1_some(tok2) => tok1.loc() + tok2.loc()
   )
 ) (* end of [endwhere_get_loc] *)
+
+////
+
+local
+
+absimpl
+d0exp_tbox = $rec{
+  d0exp_loc= loc_t
+, d0exp_node= d0exp_node
+} (* end of [absimpl] *)
+
+in (* in-of-local *)
+
+implement
+d0exp_get_loc(x) = x.d0exp_loc
+implement
+d0exp_get_node(x) = x.d0exp_node
+
+implement
+d0exp_make_node
+(loc, node) = $rec
+{
+  d0exp_loc= loc, d0exp_node= node
+} (* end of [d0exp_make_node] *)
+
+end // end of [local]
+
+(* ****** ****** *)
+
+local
+
+absimpl
+d0ecl_tbox = $rec{
+  d0ecl_loc= loc_t
+, d0ecl_node= d0ecl_node
+} (* end of [absimpl] *)
+
+in (* in-of-local *)
+
+implement
+d0ecl_get_loc(x) = x.d0ecl_loc
+implement
+d0ecl_get_node(x) = x.d0ecl_node
+
+implement
+d0ecl_make_node
+(loc, node) = $rec
+{
+  d0ecl_loc= loc, d0ecl_node= node
+} (* end of [d0ecl_make_node] *)
+
+end // end of [local]
 
 (* ****** ****** *)
 

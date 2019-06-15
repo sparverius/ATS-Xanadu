@@ -5,7 +5,7 @@
 (***********************************************************************)
 
 (*
-** ATS/Xanadu - Unleashing the Potential of Types!
+** ATS/Postiats - Unleashing the Potential of Types!
 ** Copyright (C) 2018 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
@@ -13,12 +13,12 @@
 ** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
 ** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-** 
+**
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-** 
+**
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -35,7 +35,7 @@
 //
 #staload
 UN =
-"prelude/SATS/unsafe.sats"
+"libats/SATS/unsafe.sats"
 //
 (* ****** ****** *)
 //
@@ -45,156 +45,221 @@ UN =
 //
 (* ****** ****** *)
 //
-macdef
+#macdef
 T_CASE_ = T_CASE(0)
 (*
-macdef
+#macdef
 T_CASEP_ = T_CASE( 1)
-macdef
+#macdef
 T_CASEN_ = T_CASE(~1)
 *)
 //
 (* ****** ****** *)
 //
-macdef
+#macdef
 T_FN_ = T_FUN(FNKfn0)
-macdef
+#macdef
 T_FN0_ = T_FUN(FNKfn0)
-macdef
+#macdef
 T_FNX_ = T_FUN(FNKfnx)
-macdef
+#macdef
 T_FN1_ = T_FUN(FNKfn1)
-macdef
+#macdef
 T_FUN_ = T_FUN(FNKfn1)
 //
-macdef
+#macdef
 T_PRFN_ = T_FUN(FNKprfn0)
-macdef
+#macdef
 T_PRFN0_ = T_FUN(FNKprfn0)
-macdef
+#macdef
 T_PRFN1_ = T_FUN(FNKprfn1)
-macdef
+#macdef
 T_PRFUN_ = T_FUN(FNKprfn1)
-macdef
+#macdef
 T_PRAXI_ = T_FUN(FNKpraxi)
 //
-macdef
+#macdef
 T_CASTFN_ = T_FUN(FNKcastfn)
 //
 (* ****** ****** *)
 //
-macdef
+#macdef
 T_VAL_ = T_VAL(VLKval)
 //
-macdef
+#macdef
 T_VALP_ = T_VAL(VLKvalp)
-macdef
+#macdef
 T_VALN_ = T_VAL(VLKvaln)
 //
-macdef
+#macdef
 T_PRVAL_ = T_VAL(VLKprval)
 //
 (* ****** ****** *)
 //
-macdef
+#macdef
 T_IMPLMNT_ = T_IMPLMNT(IMPval)
-macdef
+#macdef
+T_IMPLTMP_ = T_IMPLMNT(IMPtmp)
+#macdef
+T_IMPLFUN_ = T_IMPLMNT(IMPfun)
+#macdef
 T_PRIMPLMNT_ = T_IMPLMNT(IMPprf)
 //
 (* ****** ****** *)
 //
-macdef
+#macdef
 T_SEXPDEF_ = T_SEXPDEF(0)
-macdef
+#macdef
 T_PROPDEF_ = T_SEXPDEF(PROPSORT)
-macdef
+#macdef
 T_VIEWDEF_ = T_SEXPDEF(VIEWSORT)
-macdef
+#macdef
 T_TYPEDEF_ = T_SEXPDEF(TYPESORT)
-macdef
+#macdef
 T_VTYPEDEF_ = T_SEXPDEF(VTYPESORT)
 //
-macdef
+#macdef
 T_ABSTYPE_ = T_ABSTYPE(TYPESORT)
 //
 (*
-macdef
+#macdef
 T_ABSPROP_ = T_ABSTYPE(PROPSORT)
-macdef
+#macdef
 T_ABSVIEW_ = T_ABSTYPE(VIEWSORT)
 *)
 (*
-macdef
+#macdef
 T_ABSTBOX_ = T_ABSTYPE(TBOXSORT)
-macdef
+#macdef
 T_ABSTFLT_ = T_ABSTYPE(TFLATSORT)
-macdef
+#macdef
 T_ABSTFLAT_ = T_ABSTYPE(TFLATSORT)
 *)
 //
 (*
-macdef
+#macdef
 T_ABSVTYPE_ = T_ABSTYPE(VTYPESORT)
-macdef
+#macdef
 T_ABSVTBOX_ = T_ABSTYPE(VTBOXSORT)
-macdef
+#macdef
 T_ABSVTFLT_ = T_ABSTYPE(VTFLATSORT)
-macdef
+#macdef
 T_ABSVTFLAT_ = T_ABSTYPE(VTFLATSORT)
 *)
 //
 (* ****** ****** *)
 //
-macdef
+#macdef
 T_DATAPROP_ = T_DATATYPE(PROPSORT)
-macdef
+#macdef
 T_DATAVIEW_ = T_DATATYPE(VIEWSORT)
 //
-macdef
+#macdef
 T_DATATYPE_ = T_DATATYPE(TYPESORT)
-macdef
+#macdef
 T_DATAVTYPE_ = T_DATATYPE(VTYPESORT)
 //
 (* ****** ****** *)
 //
-macdef
+#macdef
 T_WITHPROP_ = T_WITHTYPE(PROPSORT)
-macdef
+#macdef
 T_WITHVIEW_ = T_WITHTYPE(VIEWSORT)
-macdef
+#macdef
 T_WITHTYPE_ = T_WITHTYPE(TYPESORT)
-macdef
+#macdef
 T_WITHVTYPE_ = T_WITHTYPE(VTYPESORT)
 //
 (* ****** ****** *)
 
-macdef
+#macdef
 T_TUPLE2_ = T_TUPLE(2)
-macdef
+#macdef
 T_TUPLE3_ = T_TUPLE(3)
-macdef
+#macdef
 T_TUPLE4_ = T_TUPLE(4)
 
-macdef
+#macdef
 T_RECORD2_ = T_RECORD(2)
-macdef
+#macdef
 T_RECORD3_ = T_RECORD(3)
-macdef
+#macdef
 T_RECORD4_ = T_RECORD(4)
 
 (* ****** ****** *)
 //
-macdef
+#macdef
 T_INFIX_ = T_SRP_FIXITY(INFIX)
-macdef
+#macdef
 T_INFIXL_ = T_SRP_FIXITY(INFIXL)
-macdef
+#macdef
 T_INFIXR_ = T_SRP_FIXITY(INFIXR)
 //
-macdef
+#macdef
 T_PREFIX_ = T_SRP_FIXITY(PREFIX)
-macdef
+#macdef
 T_POSTFIX_ = T_SRP_FIXITY(POSTFIX)
+(*
+#macdef
+T_SEXPDEF_ = T_SEXPDEF(0)
+#macdef
+T_PROPDEF_ = T_SEXPDEF(PROPSORT)
+#macdef
+T_VIEWDEF_ = T_SEXPDEF(VIEWSORT)
+#macdef
+T_TYPEDEF_ = T_SEXPDEF(TYPESORT)
+#macdef
+T_VTYPEDEF_ = T_SEXPDEF(VTYPESORT)
+//
+#macdef
+T_ABSPROP_ = T_ABSTYPE(PROPSORT)
+#macdef
+T_ABSVIEW_ = T_ABSTYPE(VIEWSORT)
+//
+#macdef
+T_ABSTYPE_ = T_ABSTYPE(TYPESORT)
+#macdef
+T_ABSTBOX_ = T_ABSTYPE(TBOXSORT)
+#macdef
+T_ABSTFLT_ = T_ABSTYPE(TFLATSORT)
+#macdef
+T_ABSTFLAT_ = T_ABSTYPE(TFLATSORT)
+//
+#macdef
+T_ABSVTYPE_ = T_ABSTYPE(VTYPESORT)
+#macdef
+T_ABSVTBOX_ = T_ABSTYPE(VTBOXSORT)
+#macdef
+T_ABSVTFLT_ = T_ABSTYPE(VTFLATSORT)
+#macdef
+T_ABSVTFLAT_ = T_ABSTYPE(VTFLATSORT)
+//
+(* ****** ****** *)
+//
+#macdef
+T_DATAPROP_ = T_DATATYPE(PROPSORT)
+#macdef
+T_DATAVIEW_ = T_DATATYPE(VIEWSORT)
+//
+#macdef
+T_DATATYPE_ = T_DATATYPE(TYPESORT)
+#macdef
+T_DATAVTYPE_ = T_DATATYPE(VTYPESORT)
+//
+(* ****** ****** *)
+//
+#macdef
+T_INFIX_ = T_SRP_FIXITY(INFIX)
+#macdef
+T_INFIXL_ = T_SRP_FIXITY(INFIXL)
+#macdef
+T_INFIXR_ = T_SRP_FIXITY(INFIXR)
+//
+#macdef
+T_PREFIX_ = T_SRP_FIXITY(PREFIX)
+#macdef
+T_POSTFIX_ = T_SRP_FIXITY(POSTFIX)
+*)
 //
 (* ****** ****** *)
 
@@ -203,7 +268,7 @@ kword_initize
   ((*void*)) where
 {
 //
-macdef
+#macdef
 myins = tnode_insert
 //
 fun
@@ -305,6 +370,8 @@ val () = myins("prval", T_PRVAL_)
 //
 val () = myins("var", T_VAR())
 //
+val () = myins("implfun", T_IMPLFUN_)
+val () = myins("impltmp", T_IMPLTMP_)
 val () = myins("implmnt", T_IMPLMNT_)
 val () = myins("implement", T_IMPLMNT_)
 val () = myins("primplmnt", T_PRIMPLMNT_)
@@ -425,8 +492,6 @@ val () = myins("#symload", T_SRP_SYMLOAD)
 //
 } (* end of [kword_initize()] *)
 
-(* ****** ****** *)
-//
 implement T_IDENT_AT = T_IDENT_sym("@")
 implement T_IDENT_EQ = T_IDENT_sym("=")
 //
@@ -436,7 +501,8 @@ implement T_IDENT_GT = T_IDENT_sym(">")
 implement T_IDENT_EQGT = T_IDENT_sym("=>")
 implement T_IDENT_LTGT = T_IDENT_sym("<>")
 implement T_IDENT_MSGT = T_IDENT_sym("->")
-//
+
+
 (* ****** ****** *)
 
 (* end of [xats_lexing_kword.dats] *)

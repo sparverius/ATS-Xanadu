@@ -5,7 +5,7 @@
 (***********************************************************************)
 
 (*
-** ATS/Xanadu - Unleashing the Potential of Types!
+** ATS/Postiats - Unleashing the Potential of Types!
 ** Copyright (C) 2018 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
@@ -13,12 +13,12 @@
 ** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
 ** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-** 
+**
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-** 
+**
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -32,22 +32,34 @@
 // Authoremail: gmhwxiATgmailDOTcom
 //
 (* ****** ****** *)
-//
-#include
-"share/atspre_staload.hats"
+
 #staload
-UN = "prelude/SATS/unsafe.sats"
-//
+UN = "libats/SATS/unsafe.sats"
+
+#staload "libats/SATS/print.sats"
+#staload _ = "libats/DATS/print.dats"
+
+#staload "libats/SATS/gint.sats"
+#staload _ = "libats/DATS/gint.dats"
+
+#staload "libats/SATS/char.sats"
+#staload _ = "libats/DATS/char.dats"
+
+#staload "libats/SATS/list.sats"
+#staload _ = "libats/DATS/list.dats"
+
+#staload "libats/SATS/list_vt.sats"
+#staload _ = "libats/DATS/list_vt.dats"
+
+#staload "libats/SATS/array.sats"
+#staload _ = "libats/DATS/array.dats"
+
 (* ****** ****** *)
-//
+
 #staload "./../SATS/basics.sats"
-//
 #staload "./../SATS/lexing.sats"
-//
-#staload "./../SATS/locinfo.sats"
-#staload
-_(*TMP*) = "./../DATS/locinfo.dats"
-//
+#staload "./../SATS/location.sats"
+
 (* ****** ****** *)
 
 local
@@ -78,265 +90,266 @@ end // end of [local]
 
 (* ****** ****** *)
 //
+(*
 implement
 print_tnode
-  (tok) =
-  fprint_tnode(stdout_ref, tok)
+  (tok) = print_tnode(stdout_ref, tok)
 implement
 prerr_tnode
   (tok) =
   fprint_tnode(stderr_ref, tok)
+*)
 //
 (* ****** ****** *)
 //
 implement
-fprint_tnode(out, tnd) =
+print_tnode(tnd) =
 (
 case+ tnd of
 //
-| T_EOF() => fprint(out, "EOF")
-| T_ERR() => fprint(out, "ERR")
+| T_EOF() => print("EOF")
+| T_ERR() => print("ERR")
 //
-| T_EOL() => fprint(out, "EOL")
+| T_EOL() => print("EOL")
 //
 | T_BLANK(x) =>
-  fprint!(out, "BLANK(", x, ")")
+  print!("BLANK(", x, ")")
 //
 | T_CLNLT(x) =>
-  fprint!(out, "CLNLT(", x, ")")
+  print!("CLNLT(", x, ")")
 | T_DOTLT(x) =>
-  fprint!(out, "DOTLT(", x, ")")
+  print!("DOTLT(", x, ")")
 //
 | T_IDENT_alp(x) =>
-  fprint!(out, "IDENT_alp(", x, ")")
+  print!("IDENT_alp(", x, ")")
 | T_IDENT_sym(x) =>
-  fprint!(out, "IDENT_sym(", x, ")")
+  print!("IDENT_sym(", x, ")")
 //
 | T_IDENT_srp(x) =>
-  fprint!(out, "IDENT_srp(", x, ")")
+  print!("IDENT_srp(", x, ")")
 | T_IDENT_dlr(x) =>
-  fprint!(out, "IDENT_dlr(", x, ")")
+  print!("IDENT_dlr(", x, ")")
 //
 | T_IDENT_qual(x) =>
-  fprint!(out, "IDENT_qual(", x, ")")
+  print!("IDENT_qual(", x, ")")
 //
 | T_INT1(rep) =>
-  fprint!(out, "INT(", rep, ")")
+  print!("INT(", rep, ")")
 | T_INT2(base, rep) =>
-  fprint!(out, "INT(", base, ", ", rep, ")")
+  print!("INT(", base, ", ", rep, ")")
 | T_INT3(base, rep, _(*sfx*)) =>
-  fprint!(out, "INT(", base, ", ", rep, ")")
+  print!("INT(", base, ", ", rep, ")")
 //
 | T_FLOAT1(rep) =>
-  fprint!(out, "FLOAT(", rep, ")")
+  print!("FLOAT(", rep, ")")
 | T_FLOAT2(base, rep) =>
-  fprint!(out, "FLOAT(", base, ", ", rep, ")")
+  print!("FLOAT(", base, ", ", rep, ")")
 | T_FLOAT3(base, rep, _(*sfx*)) =>
-  fprint!(out, "FLOAT(", base, ", ", rep, ")")
+  print!("FLOAT(", base, ", ", rep, ")")
 //
 (*
 | T_CHAR(chr) =>
   let
     val chr = int2char0(chr)
   in
-    fprint!(out, "CHAR(", chr, ")")
+    print!("CHAR(", chr, ")")
   end
 *)
 | T_CHAR_nil(rep) =>
-  fprint!(out, "CHAR_nil(", rep, ")")
+  print!("CHAR_nil(", rep, ")")
 | T_CHAR_char(rep) =>
-  fprint!(out, "CHAR_char(", rep, ")")
+  print!("CHAR_char(", rep, ")")
 | T_CHAR_slash(rep) =>
-  fprint!(out, "CHAR_slash(", rep, ")")
+  print!("CHAR_slash(", rep, ")")
 //
 | T_STRING_closed(str) =>
-  fprint!(out, "STRING_closed(", str, ")")
+  print!("STRING_closed(", str, ")")
 | T_STRING_unclsd(str) =>
-  fprint!(out, "STRING_unclsd(", str, ")")
+  print!("STRING_unclsd(", str, ")")
 //
 (*
-| T_CDATA(cdata, asz) => fprint!(out, "CDATA(...)")
+| T_CDATA(cdata, asz) => print!("CDATA(...)")
 *)
 //
 | T_SPECHAR(c) =>
-  fprint!(out, "SPECHAR(", int2char0(c), ")")
+  print!("SPECHAR(", char0_chr(* int2char0 *)(c), ")")
 //
 | T_COMMENT_line
     (init, content) =>
-    fprint!(out, "T_COMMENT_line(", init, "; ", "...)")
+    print!("T_COMMENT_line(", init, "; ", "...)")
 | T_COMMENT_rest
     (init, content) =>
-    fprint!(out, "T_COMMENT_rest(", init, "; ", "...)")
+    print!("T_COMMENT_rest(", init, "; ", "...)")
 | T_COMMENT_cblock
     (level, content) =>
-    fprint!(out, "T_COMMENT_cblock(", level, "; ", "...)")
+    print!("T_COMMENT_cblock(", level, "; ", "...)")
 | T_COMMENT_mlblock
     (level, content) =>
-    fprint!(out, "T_COMMENT_mlblock(", level, "; ", "...)")
+    print!("T_COMMENT_mlblock(", level, "; ", "...)")
 //
-| T_AT() => fprint(out, "AT")
+| T_AT() => print("AT")
 //
-| T_BAR() => fprint(out, "BAR")
-| T_CLN() => fprint(out, "CLN")
-| T_DOT() => fprint(out, "DOT")
+| T_BAR() => print("BAR")
+| T_CLN() => print("CLN")
+| T_DOT() => print("DOT")
 //
-| T_EQ() => fprint(out, "EQ")
+| T_EQ() => print("EQ")
 //
-| T_LT() => fprint(out, "LT")
-| T_GT() => fprint(out, "GT")
+| T_LT() => print("LT")
+| T_GT() => print("GT")
 //
-| T_DLR() => fprint(out, "DLR")
-| T_SRP() => fprint(out, "SRP")
+| T_DLR() => print("DLR")
+| T_SRP() => print("SRP")
 //
-| T_EQLT() => fprint(out, "EQLT")
-| T_EQGT() => fprint(out, "EQGT")
+| T_EQLT() => print("EQLT")
+| T_EQGT() => print("EQGT")
 //
-| T_LTGT() => fprint(out, "LTGT")
-| T_GTLT() => fprint(out, "GTLT")
+| T_LTGT() => print("LTGT")
+| T_GTLT() => print("GTLT")
 //
-| T_MSLT() => fprint(out, "MSLT")
+| T_MSLT() => print("MSLT")
 (*
-| T_MSGT() => fprint(out, "MSGT")
-| T_MSLTGT() => fprint(out, "MSLTGT")
+| T_MSGT() => print("MSGT")
+| T_MSLTGT() => print("MSLTGT")
 *)
 //
 (*
-| T_DOTLT() => fprint(out, "DOTLT")
+| T_DOTLT() => print("DOTLT")
 *)
-| T_GTDOT() => fprint(out, "GTDOT")
+| T_GTDOT() => print("GTDOT")
 //
-| T_COMMA() => fprint(out, "COMMA")
-| T_SMCLN() => fprint(out, "SMCLN")
+| T_COMMA() => print("COMMA")
+| T_SMCLN() => print("SMCLN")
 //
-| T_BSLASH() => fprint(out, "BSLASH")
+| T_BSLASH() => print("BSLASH")
 //
-| T_LPAREN() => fprint(out, "LPAREN")
-| T_RPAREN() => fprint(out, "RPAREN")
-| T_LBRACE() => fprint(out, "LBRACE")
-| T_RBRACE() => fprint(out, "RBRACE")
+| T_LPAREN() => print("LPAREN")
+| T_RPAREN() => print("RPAREN")
+| T_LBRACE() => print("LBRACE")
+| T_RBRACE() => print("RBRACE")
 //
-| T_LBRACK() => fprint(out, "LBRACK")
-| T_RBRACK() => fprint(out, "RBRACK")
+| T_LBRACK() => print("LBRACK")
+| T_RBRACK() => print("RBRACK")
 //
 | T_EXISTS(knd) =>
-  fprint!(out, "EXISTS(", knd, ")")
+  print!("EXISTS(", knd, ")")
 //
 | T_TUPLE(knd) =>
-  fprint!(out, "TUPLE(", knd, ")")
+  print!("TUPLE(", knd, ")")
 | T_RECORD(knd) =>
-  fprint!(out, "RECORD(", knd, ")")
+  print!("RECORD(", knd, ")")
 (*
-| T_STRUCT() => fprint(out, "STRUCT")
+| T_STRUCT() => print("STRUCT")
 *)
 //
-| T_AS() => fprint(out, "AS")
+| T_AS() => print("AS")
 //
-| T_OF() => fprint(out, "OF")
+| T_OF() => print("OF")
 //
-| T_OP() => fprint(out, "OP")
+| T_OP() => print("OP")
 //
 | T_OP_par() =>
-  fprint(out, "OP_par()")
+  print("OP_par()")
 | T_OP_sym(id) =>
-  fprint!(out, "OP_sym(", id, ")")
+  print!("OP_sym(", id, ")")
 //
-| T_IN() => fprint(out, "IN")
+| T_IN() => print("IN")
 //
-| T_AND() => fprint(out, "AND")
-| T_END() => fprint(out, "END")
+| T_AND() => print("AND")
+| T_END() => print("END")
 //
-| T_IF() => fprint(out, "IF")
-| T_SIF() => fprint(out, "SIF")
-| T_THEN() => fprint(out, "THEN")
-| T_ELSE() => fprint(out, "ELSE")
+| T_IF() => print("IF")
+| T_SIF() => print("SIF")
+| T_THEN() => print("THEN")
+| T_ELSE() => print("ELSE")
 //
-| T_WHEN() => fprint(out, "WHEN")
-| T_WITH() => fprint(out, "WITH")
+| T_WHEN() => print("WHEN")
+| T_WITH() => print("WITH")
 //
 | T_CASE(k0) =>
-  fprint!
-  (out, "CASE(", k0, ")")
+  print!("CASE(", k0, ")")
 //
-| T_SCASE() => fprint(out, "SCASE()")
+| T_SCASE() => print("SCASE()")
 //
-| T_ENDIF() => fprint(out, "ENDIF")
-| T_ENDSIF() => fprint(out, "ENDSIF")
-| T_ENDCASE() => fprint(out, "ENDCASE")
-| T_ENDSCASE() => fprint(out, "ENDSCASE")
+| T_ENDIF() => print("ENDIF")
+| T_ENDSIF() => print("ENDSIF")
+| T_ENDCASE() => print("ENDCASE")
+| T_ENDSCASE() => print("ENDSCASE")
 //
 | T_LAM(knd) =>
-  fprint!(out, "LAM(", knd, ")")
+  print!("LAM(", knd, ")")
 | T_FIX(knd) =>
-  fprint!(out, "FIX(", knd, ")")
+  print!("FIX(", knd, ")")
 //
-| T_LET() => fprint(out, "LET")
-| T_WHERE() => fprint(out, "WHERE")
-| T_LOCAL() => fprint(out, "LOCAL")
+| T_LET() => print("LET")
+| T_WHERE() => print("WHERE")
+| T_LOCAL() => print("LOCAL")
 //
-| T_ENDLAM() => fprint(out, "ENDLAM")
-| T_ENDLET() => fprint(out, "ENDLET")
-| T_ENDWHERE() => fprint(out, "ENDWHERE")
-| T_ENDLOCAL() => fprint(out, "ENDLOCAL")
+| T_ENDLAM() => print("ENDLAM")
+| T_ENDLET() => print("ENDLET")
+| T_ENDWHERE() => print("ENDWHERE")
+| T_ENDLOCAL() => print("ENDLOCAL")
 //
 | T_VAL(vlk) =>
-  fprint!(out, "VAL(", vlk, ")")
-| T_VAR() => fprint!(out, "VAR")
+  print!("VAL(", vlk, ")")
+| T_VAR() => print!("VAR")
 //
 | T_FUN(fnk) =>
-  fprint!(out, "FUN(", fnk, ")")
+  print!("FUN(", fnk, ")")
 //
 | T_IMPLMNT(knd) =>
-  fprint!(out, "IMPLMNT(", knd, ")")
+  print!("IMPLMNT(", knd, ")")
 //
 | T_ABSSORT() =>
-  fprint!(out, "ABSSORT(", ")")
+  print!("ABSSORT(", ")")
 //
 | T_SORTDEF() =>
-  fprint!(out, "SORTDEF(", ")")
+  print!("SORTDEF(", ")")
 //
 | T_SEXPDEF(srt) =>
-  fprint!(out, "SEXPDEF(", srt, ")")
+  print!("SEXPDEF(", srt, ")")
 //
 | T_ABSTYPE(srt) =>
-  fprint!(out, "ABSTYPE(", srt, ")")
+  print!("ABSTYPE(", srt, ")")
 //
 | T_ABSIMPL() =>
-  fprint!(out, "ABSIMPL")
+  print!("ABSIMPL")
 | T_ABSOPEN() =>
-  fprint!(out, "ABSOPEN")
+  print!("ABSOPEN")
 //
 | T_DATASORT() =>
-  fprint!(out, "DATASORT")
+  print!("DATASORT")
 | T_DATATYPE(srt) =>
-  fprint!(out, "DATATYPE(", srt, ")")
+  print!("DATATYPE(", srt, ")")
 //
 | T_WITHTYPE(srt) =>
-  fprint!(out, "WITHTYPE(", srt, ")")
+  print!("WITHTYPE(", srt, ")")
 //
 | T_SRP_NONFIX() =>
-  fprint!(out, "#NONFIX")
+  print!("#NONFIX")
 | T_SRP_FIXITY(knd) =>
-  fprint!(out, "#FIXIXTY(", knd, ")")
+  print!("#FIXIXTY(", knd, ")")
 //
-| T_SRP_STACST() => fprint(out, "#STACST")
+| T_SRP_STACST() => print("#STACST")
 //
-| T_SRP_STATIC() => fprint(out, "#STATIC")
-| T_SRP_EXTERN() => fprint(out, "#EXTERN")
+| T_SRP_STATIC() => print("#STATIC")
+| T_SRP_EXTERN() => print("#EXTERN")
 //
-| T_SRP_DEFINE() => fprint(out, "#DEFINE")
-| T_SRP_MACDEF() => fprint(out, "#MACDEF")
+| T_SRP_DEFINE() => print("#DEFINE")
+| T_SRP_MACDEF() => print("#MACDEF")
 //
-| T_SRP_INCLUDE() => fprint(out, "#INCLUDE")
+| T_SRP_INCLUDE() => print("#INCLUDE")
 //
-| T_SRP_STALOAD() => fprint(out, "#STALOAD")
-| T_SRP_DYNLOAD() => fprint(out, "#DYNLOAD")
+| T_SRP_STALOAD() => print("#STALOAD")
+| T_SRP_DYNLOAD() => print("#DYNLOAD")
 //
-| T_SRP_SYMLOAD() => fprint(out, "#SYMLOAD")
+| T_SRP_SYMLOAD() => print("#SYMLOAD")
 //
 ) (* end of [fprint_tnode] *)
 //
 (* ****** ****** *)
 //
+(*
 implement
 print_token
   (tok) =
@@ -345,19 +358,20 @@ implement
 prerr_token
   (tok) =
   fprint_token(stderr_ref, tok)
+*)
 //
 implement
-fprint_token
-  (out, tok) =
+print_token(tok) =
 (
-  fprint(out, tok.node())
+  print(tok.node())
 (*
-  fprint!(out, tok.loc(), ": ", tok.node())
+  print!(tok.loc(), ": ", tok.node())
 *)
 )
 //
 (* ****** ****** *)
 //
+(*
 implement
 print2_tnode
   (tok) =
@@ -366,235 +380,269 @@ implement
 prerr2_tnode
   (tok) =
   fprint2_tnode(stderr_ref, tok)
+*)
 //
 (* ****** ****** *)
 //
 implement
-fprint2_tnode(out, tnd) =
+print2_tnode(tnd) =
 (
 case+ tnd of
 //
 | T_EOF() => ()
 | T_ERR() =>
-  fprint(out, "*ERROR*")
+  print("*ERROR*")
 //
-| T_EOL() => fprint(out, "\n")
+| T_EOL() => print("\n")
 //
-| T_BLANK(x) => fprint(out, x)
+| T_BLANK(x) => print(x)
 //
-| T_CLNLT(x) => fprint(out, x)
-| T_DOTLT(x) => fprint(out, x)
+| T_CLNLT(x) => print(x)
+| T_DOTLT(x) => print(x)
 //
-| T_IDENT_alp(x) => fprint(out, x)
-| T_IDENT_sym(x) => fprint(out, x)
+| T_IDENT_alp(x) => print(x)
+| T_IDENT_sym(x) => print(x)
 //
-| T_IDENT_srp(x) => fprint(out, x)
-| T_IDENT_dlr(x) => fprint(out, x)
+| T_IDENT_srp(x) => print(x)
+| T_IDENT_dlr(x) => print(x)
 //
-| T_IDENT_qual(x) => fprint(out, x)
+| T_IDENT_qual(x) => print(x)
 //
-| T_INT1(rep) => fprint(out, rep)
-| T_INT2(base, rep) => fprint(out, rep)
-| T_INT3(base, rep, _(*sfx*)) => fprint(out, rep)
+| T_INT1(rep) => print(rep)
+| T_INT2(base, rep) => print(rep)
+| T_INT3(base, rep, _(*sfx*)) => print(rep)
 //
-| T_FLOAT1(rep) => fprint(out, rep)
-| T_FLOAT2(base, rep) => fprint(out, rep)
-| T_FLOAT3(base, rep, _(*sfx*)) => fprint(out, rep)
+| T_FLOAT1(rep) => print(rep)
+| T_FLOAT2(base, rep) => print(rep)
+| T_FLOAT3(base, rep, _(*sfx*)) => print(rep)
 //
 (*
 | T_CHAR(chr) =>
   let
     val chr = int2char0(chr)
   in
-    fprint!(out, "CHAR(", chr, ")")
+    print!("CHAR(", chr, ")")
   end
 *)
-| T_CHAR_nil(rep) => fprint(out, rep)
-| T_CHAR_char(rep) => fprint(out, rep)
-| T_CHAR_slash(rep) => fprint(out, rep)
+| T_CHAR_nil(rep) => print(rep)
+| T_CHAR_char(rep) => print(rep)
+| T_CHAR_slash(rep) => print(rep)
 //
-| T_STRING_closed(str) => fprint(out, str)
-| T_STRING_unclsd(str) => fprint(out, str)
+| T_STRING_closed(str) => print(str)
+| T_STRING_unclsd(str) => print(str)
 //
 (*
-| T_CDATA(cdata, asz) => fprint!(out, "CDATA(...)")
+| T_CDATA(cdata, asz) => print!("CDATA(...)")
 *)
 //
 | T_SPECHAR(c) =>
-  fprint(out, c) where{val c=int2char0(c)}
+  print(c) where{val c=char0_chr(* int2char0 *)(c)}
 //
 | T_COMMENT_line
     (init, content) =>
-    fprint!(out, init, content)
+    print!(init, content)
 | T_COMMENT_rest
     (init, content) =>
-    fprint!(out, init, content)
+    print!(init, content)
 | T_COMMENT_cblock
-    (level, content) => fprint(out, content)
+    (level, content) => print(content)
 | T_COMMENT_mlblock
-    (level, content) => fprint(out, content)
+    (level, content) => print(content)
 //
-| T_AT() => fprint(out, "@")
+| T_AT() => print("@")
 //
-| T_BAR() => fprint(out, "|")
-| T_CLN() => fprint(out, ":")
-| T_DOT() => fprint(out, ".")
+| T_BAR() => print("|")
+| T_CLN() => print(":")
+| T_DOT() => print(".")
 //
-| T_EQ() => fprint(out, "=")
+| T_EQ() => print("=")
 //
-| T_LT() => fprint(out, "<")
-| T_GT() => fprint(out, ">")
+| T_LT() => print("<")
+| T_GT() => print(">")
 //
-| T_DLR() => fprint(out, "$")
-| T_SRP() => fprint(out, "#")
+| T_DLR() => print("$")
+| T_SRP() => print("#")
 //
-| T_EQLT() => fprint(out, "=<")
-| T_EQGT() => fprint(out, "=>")
+| T_EQLT() => print("=<")
+| T_EQGT() => print("=>")
 //
-| T_LTGT() => fprint(out, "<>")
-| T_GTLT() => fprint(out, "><")
+| T_LTGT() => print("<>")
+| T_GTLT() => print("><")
 //
-| T_MSLT() => fprint(out, "-<")
+| T_MSLT() => print("-<")
 (*
-| T_MSGT() => fprint(out, "->")
-| T_MSLTGT() => fprint(out, "-<>")
+| T_MSGT() => print("->")
+| T_MSLTGT() => print("-<>")
 *)
 //
-| T_GTDOT() => fprint(out, ">.")
+| T_GTDOT() => print(">.")
 //
-| T_COMMA() => fprint(out, ",")
-| T_SMCLN() => fprint(out, ";")
+| T_COMMA() => print(",")
+| T_SMCLN() => print(";")
 //
-| T_BSLASH() => fprint(out, "\\")
+| T_BSLASH() => print("\\")
 //
-| T_LPAREN() => fprint(out, "(")
-| T_RPAREN() => fprint(out, ")")
-| T_LBRACE() => fprint(out, "{")
-| T_RBRACE() => fprint(out, "}")
+| T_LPAREN() => print("(")
+| T_RPAREN() => print(")")
+| T_LBRACE() => print("{")
+| T_RBRACE() => print("}")
 //
-| T_LBRACK() => fprint(out, "[")
-| T_RBRACK() => fprint(out, "]")
+| T_LBRACK() => print("[")
+| T_RBRACK() => print("]")
 //
 | T_EXISTS(knd) =>
-  fprint!(out, "exists(", knd, ")")
+  print!("exists(", knd, ")")
 //
 | T_TUPLE(knd) =>
-  fprint!(out, "tuple(", knd, ")")
+  print!("tuple(", knd, ")")
 | T_RECORD(knd) =>
-  fprint!(out, "record(", knd, ")")
+  print!("record(", knd, ")")
 //
 (*
 | T_STRUCT(knd) =>
-  fprint!(out, "struct(", knd, ")")
+  print!("struct(", knd, ")")
 *)
 //
-| T_AS() => fprint(out, "as")
+| T_AS() => print("as")
 //
-| T_OF() => fprint(out, "of")
+| T_OF() => print("of")
 //
-| T_OP() => fprint(out, "op")
+| T_OP() => print("op")
 //
-| T_OP_par() => fprint(out, "op(")
-| T_OP_sym(id) => fprint!(out, "op", id)
+| T_OP_par() => print("op(")
+| T_OP_sym(id) => print!("op", id)
 //
-| T_IN() => fprint(out, "in")
+| T_IN() => print("in")
 //
-| T_AND() => fprint(out, "and")
-| T_END() => fprint(out, "end")
+| T_AND() => print("and")
+| T_END() => print("end")
 //
-| T_IF() => fprint(out, "if")
-| T_SIF() => fprint(out, "sif")
-| T_THEN() => fprint(out, "then")
-| T_ELSE() => fprint(out, "else")
+| T_IF() => print("if")
+| T_SIF() => print("sif")
+| T_THEN() => print("then")
+| T_ELSE() => print("else")
 //
-| T_WHEN() => fprint(out, "when")
-| T_WITH() => fprint(out, "with")
+| T_WHEN() => print("when")
+| T_WITH() => print("with")
 //
 | T_CASE(k0) =>
-  fprint!(out, "case(", k0, ")")
+  print!("case(", k0, ")")
 //
-| T_SCASE() => fprint(out, "scase")
+| T_SCASE() => print("scase")
 //
-| T_ENDIF() => fprint(out, "endif")
-| T_ENDSIF() => fprint(out, "endsif")
-| T_ENDCASE() => fprint(out, "endcase")
-| T_ENDSCASE() => fprint(out, "endscase")
+| T_ENDIF() => print("endif")
+| T_ENDSIF() => print("endsif")
+| T_ENDCASE() => print("endcase")
+| T_ENDSCASE() => print("endscase")
 //
 | T_LAM(knd) =>
-  fprint!(out, "lam(", knd, ")")
+  print!("lam(", knd, ")")
 | T_FIX(knd) =>
-  fprint!(out, "fix(", knd, ")")
+  print!("fix(", knd, ")")
 //
-| T_LET() => fprint(out, "let")
-| T_WHERE() => fprint(out, "where")
-| T_LOCAL() => fprint(out, "local")
+| T_LET() => print("let")
+| T_WHERE() => print("where")
+| T_LOCAL() => print("local")
 //
-| T_ENDLAM() => fprint(out, "endlam")
-| T_ENDLET() => fprint(out, "endlet")
-| T_ENDWHERE() => fprint(out, "endwhere")
-| T_ENDLOCAL() => fprint(out, "endlocal")
+| T_ENDLAM() => print("endlam")
+| T_ENDLET() => print("endlet")
+| T_ENDWHERE() => print("endwhere")
+| T_ENDLOCAL() => print("endlocal")
 //
 | T_VAL(vlk) =>
-  fprint!(out, "VAL(", vlk, ")")
-| T_VAR() => fprint!(out, "var")
+  print!("VAL(", vlk, ")")
+| T_VAR() => print!("var")
 //
 | T_FUN(fnk) =>
-  fprint!(out, "FUN(", fnk, ")")
+  print!("FUN(", fnk, ")")
 //
 | T_IMPLMNT(knd) =>
-  fprint!(out, "implmnt(", knd, ")")
+  print!("implmnt(", knd, ")")
 //
 | T_ABSSORT() =>
-  fprint!(out, "abssort(", ")")
+  print!("abssort(", ")")
 //
 | T_SORTDEF() =>
-  fprint!(out, "sortdef(", ")")
+  print!("sortdef(", ")")
 //
 | T_SEXPDEF(knd) =>
-  fprint!(out, "sexpdef(", knd, ")")
+  print!("sexpdef(", knd, ")")
 //
 | T_ABSTYPE(knd) =>
-  fprint!(out, "abstype(", knd, ")")
+  print!("abstype(", knd, ")")
 //
 | T_ABSIMPL() =>
-  fprint!(out, "absimpl")
+  print!("absimpl")
 | T_ABSOPEN() =>
-  fprint!(out, "absopen")
+  print!("absopen")
 //
 | T_DATASORT() =>
-  fprint!(out, "datasort")
+  print!("datasort")
 | T_DATATYPE(knd) =>
-  fprint!(out, "datatype(", knd, ")")
+  print!("datatype(", knd, ")")
 //
 | T_WITHTYPE(knd) =>
-  fprint!(out, "withtype(", knd, ")")
+  print!("withtype(", knd, ")")
 //
 | T_SRP_NONFIX() =>
-  fprint!(out, "#nonfix")
+  print!("#nonfix")
 | T_SRP_FIXITY(knd) =>
-  fprint!(out, "#fixity(", knd, ")")
+  print!("#fixity(", knd, ")")
 //
-| T_SRP_STACST() => fprint!(out, "#stacst")
+| T_SRP_STACST() => print!("#stacst")
 //
-| T_SRP_STATIC() => fprint!(out, "#static")
-| T_SRP_EXTERN() => fprint!(out, "#extern")
+| T_SRP_STATIC() => print!("#static")
+| T_SRP_EXTERN() => print!("#extern")
 //
-| T_SRP_DEFINE() => fprint!(out, "#define")
-| T_SRP_MACDEF() => fprint!(out, "#macdef")
+| T_SRP_DEFINE() => print("#define")
+| T_SRP_MACDEF() => print("#macdef")
 //
-| T_SRP_INCLUDE() => fprint(out, "#include")
+| T_SRP_INCLUDE() => print("#include")
 //
-| T_SRP_STALOAD() => fprint(out, "#staload")
-| T_SRP_DYNLOAD() => fprint(out, "#dynload")
+| T_SRP_STALOAD() => print("#staload")
+| T_SRP_DYNLOAD() => print("#dynload")
 //
-| T_SRP_SYMLOAD() => fprint(out, "#symload")
+| T_SRP_SYMLOAD() => print("#symload")
 //
 ) (* end of [fprint2_tnode] *)
 //
 (* ****** ****** *)
 
+%{
+ATSdynexn_dec(temptory_056___ArraySubscriptExn) ;
+%}
+
+
 local
 //
+#macdef c2i(x) = $UN.cast{size}(char0_ord(,(x)))
+//
+val
+theAsz =
+(* i2sz *)$UN.cast{size}(128)
+val
+theMap =
+(* arrayref_make_elt<tnode> *)
+arrszref_make_elt<tnode>(theAsz, T_EOF())
+//
+(*
+val () = theMap[c2i('=')] := T_EQ()
+*)
+//
+val () = theMap[c2i(',')] := T_COMMA()
+val () = theMap[c2i(';')] := T_SMCLN()
+//
+val () = theMap[c2i('\(')] := T_LPAREN()
+val () = theMap[c2i('\)')] := T_RPAREN()
+//
+val () = theMap[c2i('\{')] := T_LBRACE()
+val () = theMap[c2i('\}')] := T_RBRACE()
+//
+val () = theMap[c2i('\[')] := T_LBRACK()
+val () = theMap[c2i('\]')] := T_RBRACK()
+//
+val () = theMap[c2i('\\')] := T_BSLASH()
+(*
 #define c2i char2int1
 //
 val
@@ -622,13 +670,14 @@ val () = theMap[c2i('\}')] := T_RBRACE()
 //
 val () = theMap[c2i('\[')] := T_LBRACK()
 val () = theMap[c2i('\]')] := T_RBRACK()
+*)
 //
 in (* in-of-local *)
 
 implement
 char2tnode(i0) = let
 //
-typedef AszLt = intBtw(0, 128)
+typedef AszLt = [ n:int | 0 < n && n < 128 ] int(n)
 //
 in
 //
@@ -724,6 +773,7 @@ then true else tnode_is_comment(node)
 //
 (* ****** ****** *)
 
+(*
 local
 //
 #staload
@@ -736,12 +786,45 @@ _(*anon*) = "libats/DATS/hashtbl_linprb.dats"
 //
 typedef key = string and itm = tnode
 vtypedef hashtbl = hashtbl(key, itm)
+*)
+
+#staload
+"libats/temp/SATS/hashmap_chain.sats"
+
+#staload
+"libats/temp/SATS/hashmap_chain.sats"
+
+(* ****** ****** *)
+
+local
+
+#staload _ =
+"libats/temp/DATS/hashfun.dats"
+#staload _ =
+"libats/temp/DATS/linmap_list.dats"
+#staload _ =
+"libats/temp/DATS/hashmap_chain.dats"
+
+//
+(*
+#staload
+"libats/SATS/hashtbl_linprb.sats"
+//
+#staload
+_(*anon*) = "libats/DATS/hashfun.dats"
+#staload
+_(*anon*) = "libats/DATS/hashtbl_linprb.dats"
+*)
+//
+typedef key = string and itm = tnode
+vtypedef hashtbl = hashmap(key, itm)
+
 //
 val
 theCap = 229
 val
-theHashtbl = 
-hashtbl_make_nil<key,itm>(i2sz(theCap))
+theHashtbl =
+hashmap_make_hcap<key,itm>(i2sz(theCap))
 val
 theHashtbl = $UN.castvwtp0{ptr}(theHashtbl)
 //
@@ -755,7 +838,7 @@ var res: itm?
 val tbl =
 $UN.castvwtp0{hashtbl}(theHashtbl)
 val ans =
-hashtbl_search<key,itm>(tbl, name, res)
+hashmap_search<key,itm>(tbl, name, res)
 prval ((*void*)) = $UN.cast2void(tbl)
 //
 in
@@ -776,9 +859,9 @@ var res: itm?
 val tbl =
 $UN.castvwtp0{hashtbl}(theHashtbl)
 val ans =
-hashtbl_insert<key,itm>(tbl, name, node, res)
+hashmap_insert<key,itm>(tbl, name, node, res)
 //
-val ((*void*)) = assertloc(ans = false)
+(* val ((*void*)) = assertloc(ans = false) *)
 //
 prval ((*void*)) = opt_clear(res)
 prval ((*void*)) = $UN.cast2void(tbl)
@@ -957,6 +1040,8 @@ end // end of [lexing_locatize_node]
 
 (* ****** ****** *)
 
+extern castfn ofg0{a:tflt}(list0_vt(a)) : [n:int | n >= 0] list1_vt(a, n)
+
 implement
 lexing_locatize_nodelst
   (pos, nodes) = let
@@ -968,18 +1053,18 @@ loop
 , tokens: tokenlst_vt): tokenlst_vt =
 (
 case+ nodes of
-| list_nil() =>
-  list_vt_reverse(tokens)
-| list_cons(node, nodes) => let
+| list1_nil() =>
+  ofg0(list0_vt_reverse(g0ofg1 tokens))
+| list1_cons(node, nodes) => let
     val token =
     lexing_locatize_node(pos, node)
   in
-    loop(pos, nodes, list_vt_cons(token, tokens))
+    loop(pos, nodes, list1_vt_cons(token, tokens))
   end // end of [list_cons]
 )
 //
 in
-  loop(pos, nodes, list_vt_nil(*void*))
+  loop(pos, nodes, list1_vt_nil(*void*))
 end // end of [lexing_locatize_tnodelst]
 
 (* ****** ****** *)
@@ -994,8 +1079,8 @@ loop0
 , res: tokenlst_vt): tokenlst_vt =
 (
 case+ xs0 of
-| ~list_vt_nil() => res
-| ~list_vt_cons(x0, xs1) =>
+| ~list1_vt_nil() => res
+| ~list1_vt_cons(x0, xs1) =>
    (loop1(x0, xs1, res))
 )
 and
@@ -1005,9 +1090,9 @@ loop1
 , res: tokenlst_vt): tokenlst_vt =
 (
 case+ xs1 of
-| ~list_vt_nil() =>
-   list_vt_cons(x0, res)
-| ~list_vt_cons(x1, xs2) =>
+| ~list1_vt_nil() =>
+   list1_vt_cons(x0, res)
+| ~list1_vt_cons(x1, xs2) =>
    (loop2(x0, x1, xs2, res))
 )
 and
@@ -1041,19 +1126,19 @@ case+ x0.node() of
         val x01 =
         token_make_node(loc, T_TUPLE(0))
       in
-        loop0(xs2, list_vt_cons(x01, res))
+        loop0(xs2, list1_vt_cons(x01, res))
       end // end of ["("]
     | T_LBRACE() => let
         val loc = x0.loc()+x1.loc()
         val x01 =
         token_make_node(loc, T_RECORD(0))
       in
-        loop0(xs2, list_vt_cons(x01, res))
+        loop0(xs2, list1_vt_cons(x01, res))
       end // end of ["{"]
 //
     | _ (* rest-of-tnode *) =>
       (
-        loop1(x1, xs2, list_vt_cons(x0, res))
+        loop1(x1, xs2, list1_vt_cons(x0, res))
       ) (* end of [rest-of-tnode] *)
 //
   )
@@ -1066,18 +1151,18 @@ case+ x0.node() of
         val x01 =
         token_make_node(loc, T_OP_par())
       in
-        loop0(xs2, list_vt_cons(x01, res))
+        loop0(xs2, list1_vt_cons(x01, res))
       end // end of [T_LPAREN]
     | T_IDENT_sym(id) => let
         val loc = x0.loc()+x1.loc()
         val x01 =
         token_make_node(loc, T_OP_sym(id))
       in
-        loop0(xs2, list_vt_cons(x01, res))
+        loop0(xs2, list1_vt_cons(x01, res))
       end // end of [T_IDENT_sym]
     | _ (* rest-of-tnode *) =>
       (
-        loop1(x1, xs2, list_vt_cons(x0, res))
+        loop1(x1, xs2, list1_vt_cons(x0, res))
       ) (* end of [rest-of-tnode] *)
   )
 //
@@ -1089,19 +1174,19 @@ case+ x0.node() of
         val x01 =
         token_make_node(loc, T_TUPLE(1))
       in
-        loop0(xs2, list_vt_cons(x01, res))
+        loop0(xs2, list1_vt_cons(x01, res))
       end // end of ["("]
     | T_LBRACE() => let
         val loc = x0.loc()+x1.loc()
         val x01 =
         token_make_node(loc, T_RECORD(1))
       in
-        loop0(xs2, list_vt_cons(x01, res))
+        loop0(xs2, list1_vt_cons(x01, res))
       end // end of ["{"]
 //
     | _ (* rest-of-tnode *) =>
       (
-        loop1(x1, xs2, list_vt_cons(x0, res))
+        loop1(x1, xs2, list1_vt_cons(x0, res))
       ) (* end of [rest-of-tnode] *)
 //
   )
@@ -1113,10 +1198,10 @@ case+ x0.node() of
         val x01 =
         token_make_node(loc, T_EXISTS(1))
       in
-        loop0(xs2, list_vt_cons(x01, res))
+        loop0(xs2, list1_vt_cons(x01, res))
       end // end of ["("]
     | _ (* rest-of-tnode *) =>
-        loop1(x1, xs2, list_vt_cons(x0, res))
+        loop1(x1, xs2, list1_vt_cons(x0, res))
   )
 //
 | T_LAM(k0) =>
@@ -1127,10 +1212,10 @@ case+ x0.node() of
         val x01 =
         token_make_node(loc, T_LAM(k0+1))
       in
-        loop0(xs2, list_vt_cons(x01, res))
+        loop0(xs2, list1_vt_cons(x01, res))
       end // end of [T_AT]
     | _ (* rest-of-tnode *) =>
-        loop1(x1, xs2, list_vt_cons(x0, res))
+        loop1(x1, xs2, list1_vt_cons(x0, res))
       // end of [rest-of-tnode]
   )
 | T_FIX(k0) =>
@@ -1141,10 +1226,10 @@ case+ x0.node() of
         val x01 =
         token_make_node(loc, T_FIX(k0+1))
       in
-        loop0(xs2, list_vt_cons(x01, res))
+        loop0(xs2, list1_vt_cons(x01, res))
       end // end of [T_AT]
     | _ (* rest-of-tnode *) =>
-        loop1(x1, xs2, list_vt_cons(x0, res))
+        loop1(x1, xs2, list1_vt_cons(x0, res))
       // end of [rest-of-tnode]
   )
 //
@@ -1156,17 +1241,17 @@ case+ x0.node() of
         val x01 =
         token_make_node(loc, T_VAL(VLKvalp))
       in
-        loop0(xs2, list_vt_cons(x01, res))
+        loop0(xs2, list1_vt_cons(x01, res))
       end // end of [T_IDENT_sym(+)]
     | T_IDENT_sym("-") => let
         val loc = x0.loc()+x1.loc()
         val x01 =
         token_make_node(loc, T_VAL(VLKvaln))
       in
-        loop0(xs2, list_vt_cons(x01, res))
+        loop0(xs2, list1_vt_cons(x01, res))
       end // end of [T_IDENT_sym(-)]
     | _ (* rest-of-tnode *) =>
-        loop1(x1, xs2, list_vt_cons(x0, res))
+        loop1(x1, xs2, list1_vt_cons(x0, res))
       // end of [rest-of-tnode]
   )
 //
@@ -1178,26 +1263,26 @@ case+ x0.node() of
         val x01 =
         token_make_node(loc, T_CASE(1))
       in
-        loop0(xs2, list_vt_cons(x01, res))
+        loop0(xs2, list1_vt_cons(x01, res))
       end // end of [T_IDENT_sym(+)]
     | T_IDENT_sym("-") => let
         val loc = x0.loc()+x1.loc()
         val x01 =
         token_make_node(loc, T_CASE(~1))
       in
-        loop0(xs2, list_vt_cons(x01, res))
+        loop0(xs2, list1_vt_cons(x01, res))
       end // end of [T_IDENT_sym(-)]
     | _ (* rest-of-tnode *) =>
-        loop1(x1, xs2, list_vt_cons(x0, res))
+        loop1(x1, xs2, list1_vt_cons(x0, res))
       // end of [rest-of-tnode]
   )
 //
 (*
 | T_LTGT((*void*)) => let
     val loc = x0.loc()
-    val x00 = 
+    val x00 =
     token_make_node(loc, T_LT())
-    val x01 = 
+    val x01 =
     token_make_node(loc, T_GT())
   in
     loop1
@@ -1207,22 +1292,22 @@ case+ x0.node() of
 *)
 | T_GTLT((*void*)) => let
     val loc = x0.loc()
-    val x00 = 
+    val x00 =
     token_make_node(loc, T_GT())
-    val x01 = 
+    val x01 =
     token_make_node(loc, T_LT())
   in
     loop1
     ( x1, xs2
-    , list_vt_cons(x01, list_vt_cons(x00, res)))
+    , list1_vt_cons(x01, list1_vt_cons(x00, res)))
   end // end of [T_GTLT]
 //
 (*
 | T_DOTLTGTDOT() => let
     val loc = x0.loc()
-    val x00 = 
+    val x00 =
     token_make_node(loc, T_DOTLT())
-    val x01 = 
+    val x01 =
     token_make_node(loc, T_GTDOT())
   in
     loop1
@@ -1251,14 +1336,14 @@ case+ x0.node() of
 //
 | _ (* rest-of-tnode *) =>
   (
-    loop1(x1, xs2, list_vt_cons(x0, res))
+    loop1(x1, xs2, list1_vt_cons(x0, res))
   ) (* end of [rest-of-tnode] *)
 //
 )
 //
 in
 //
-list_vt_reverse<token>(loop0(toks, list_vt_nil()))
+ofg0(list0_vt_reverse<token>(g0ofg1(loop0(toks, list1_vt_nil()))))
 //
 end // end of [lexing_preprocess_tokenlst]
 

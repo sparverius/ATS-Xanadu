@@ -5,7 +5,7 @@
 (***********************************************************************)
 
 (*
-** ATS/Xanadu - Unleashing the Potential of Types!
+** ATS/Postiats - Unleashing the Potential of Types!
 ** Copyright (C) 2018 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
@@ -13,12 +13,12 @@
 ** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
 ** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-** 
+**
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-** 
+**
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -33,6 +33,8 @@
 //
 (* ****** ****** *)
 //
+#include "./share.sats"
+
 #define INFIX 0
 #define INFIXL 1
 #define INFIXR 2
@@ -45,6 +47,22 @@
 #define BOXFLG (0x1 << 0)
 #define LINFLG (0x1 << 1)
 #define PRFFLG (0x1 << 2)
+
+(* ****** ****** *)
+//
+(*
+#define PROPSORT 0
+#define VIEWSORT 0
+//
+#define TYPESORT 0
+#define TBOXSORT 0
+#define TFLATSORT 0
+#define VTYPESORT 0
+#define VTBOXSORT 0
+#define VTFLATSORT 0
+*)
+//
+(* ****** ****** *)
 
 (* ****** ****** *)
 
@@ -134,25 +152,25 @@ fun sortpolneg(x: int): int
 fun
 subsort_int_int(int, int): bool
 //
-overload subsort with subsort_int_int
+#symload subsort with subsort_int_int
 //
 (* ****** ****** *)
 
 datatype
 dctkind =
-| DCKfun of ()
-| DCKval of ()
-| DCKpraxi of ()
-| DCKprfun of ()
-| DCKprval of ()
-| DCKcastfn of ()
+  | DCKfun of ()
+  | DCKval of ()
+  | DCKpraxi of ()
+  | DCKprfun of ()
+  | DCKprval of ()
+  | DCKcastfn of ()
 // end of [dcstkind]
 
 (* ****** ****** *)
 //
 fun
-fprint_dctkind:fprint_type(dctkind)
-overload fprint with fprint_dctkind
+print_dctkind: print_type(dctkind)
+#symload print with print_dctkind
 //
 (* ****** ****** *)
 //
@@ -169,8 +187,8 @@ valkind =
 // end of [valkind]
 //
 fun
-fprint_valkind:fprint_type(valkind)
-overload fprint with fprint_valkind
+print_valkind: print_type(valkind)
+#symload print with print_valkind
 //
 (* ****** ****** *)
 
@@ -192,20 +210,23 @@ funkind =
 // end of [funkind]
 //
 fun
-fprint_funkind:fprint_type(funkind)
-overload fprint with fprint_funkind
+print_funkind: print_type(funkind)
+#symload print with print_funkind
 //
 (* ****** ****** *)
 //
 datatype
 impkind =
 //
+| IMPtmp // template
+| IMPfun // fun implementation
 | IMPprf // proof implementation
 | IMPval // value implementation
 //
 fun
-fprint_impkind:fprint_type(impkind)
-overload fprint with fprint_impkind
+print_impkind: print_type(impkind)
+#symload
+print with print_impkind
 //
 (* ****** ****** *)
 //
@@ -217,13 +238,11 @@ HX: level-2 syntax
 #define CLOPTR (1) // linear-boxed
 #define CLOREF %(~1) // non-linear-boxed
 //
+// function/closure
 datatype
 funclo2 =
-//
-// function/closure
-//
-| FC2fun of ((*fun*))
-| FC2clo of int(*knd*) // closure: knd=1/0/~1: ptr/clo/ref
+  | FC2fun of ((*fun*))
+  | FC2clo of int(*knd*) // closure: knd=1/0/~1: ptr/clo/ref
 //
 val FC2clo_: funclo2 // flat
 val FC2cloptr: funclo2 // linear
@@ -231,24 +250,28 @@ val FC2cloref: funclo2 // nonlin
 //
 fun
 print_funclo2: print_type(funclo2)
+(*
 fun
 prerr_funclo2: prerr_type(funclo2)
 fun
 fprint_funclo2: fprint_type(funclo2)
+*)
 //
-overload print with print_funclo2
+#symload print with print_funclo2
+(*
 overload prerr with prerr_funclo2
 overload fprint with fprint_funclo2
-//
+*)
+
 (* ****** ****** *)
 //
 typedef
-eq_type(a:t0ype) = (a, a) -> bool
+eq_type(a:tflt) = (a, a) -> bool
 typedef
-neq_type(a:t0ype) = (a, a) -> bool
+neq_type(a:tflt) = (a, a) -> bool
 //
 typedef
-compare_type(a:t0ype) = (a, a) -> int
+compare_type(a:tflt) = (a, a) -> int
 //
 (* ****** ****** *)
 //
@@ -256,7 +279,7 @@ fun
 xats_string_append
   : (string, string) -<fun> string
 //
-overload + with xats_string_append of 100
+#symload + with xats_string_append of 100
 //
 (* ****** ****** *)
 

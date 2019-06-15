@@ -5,7 +5,7 @@
 (***********************************************************************)
 
 (*
-** ATS/Xanadu - Unleashing the Potential of Types!
+** ATS/Postiats - Unleashing the Potential of Types!
 ** Copyright (C) 2018 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
@@ -13,12 +13,12 @@
 ** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
 ** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-** 
+**
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-** 
+**
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -32,17 +32,11 @@
 // Authoremail: gmhwxiATgmailDOTcom
 //
 (* ****** ****** *)
-
+//
 #staload "./basics.sats"
-
-(* ****** ****** *)
-//
-(*
 #staload SYM = "./symbol.sats"
-  typedef symbol = $SYM.symbol
-*)
 //
-#staload LOC = "./locinfo.sats"
+#staload LOC = "./location.sats"
   typedef pos_t = $LOC.position
   typedef loc_t = $LOC.location
 //
@@ -89,6 +83,7 @@ tnode =
 //
   | T_STRING_closed of (string) // utf-8 // for text
   | T_STRING_unclsd of (string) // utf-8 // for text
+  (* | T_STRING_quote of (string) // utf-8 // for text *)
 //
 (*
   | {n:int}
@@ -193,7 +188,7 @@ tnode =
   | T_ENDSIF of () // 'endsif'
   | T_ENDCASE of () // 'endcase'
   | T_ENDSCASE of () // 'endscase'
-//
+
   | T_LAM of int
     // 'lam=lam1' and 'lam@=lam0'
   | T_FIX of int
@@ -256,6 +251,41 @@ tnode =
   | T_SRP_DYNLOAD of () // #dynload
 //
   | T_SRP_SYMLOAD of () // #symload
+
+(*
+  | T_LET of () // 'end'
+  | T_WHERE of () // 'where'
+  | T_LOCAL of () // 'local'
+//
+  | T_ENDLET of () // 'endlet'
+  | T_ENDWHERE of () // 'endwhere'
+  | T_ENDLOCAL of () // 'endlocal'
+//
+  | T_IF of () // 'if'
+  | T_SIF of () // 'sif'
+  | T_THEN of () // 'then'
+  | T_ELSE of () // 'else'
+//
+  | T_LAM of int // 'lam=lam1' and 'lam@=lam0'
+  | T_FIX of int // 'fix=lam1' and 'fix@=fix0'
+//
+  | T_SORTDEF of ()
+  | T_SEXPDEF of int(*kind*)
+//
+  | T_ABSTYPE of int(*kind*)
+//
+  | T_DATASORT of ()
+//
+  | T_DATATYPE of int(*kind*)
+//
+  | T_SRP_NONFIX of ()
+  | T_SRP_FIXITY of int(*kind*)
+//
+  | T_SRP_INCLUDE of () // #include
+//
+  | T_SRP_STALOAD of () // #staload
+  | T_SRP_DYNLOAD of () // #dynload
+*)
 //
 abstbox token_tbox = $tup((*void*))
 //
@@ -267,6 +297,12 @@ $rec{
 } (* end of [token] *)
 *)
 //
+
+#include "./share.sats"
+
+(* ****** ****** *)
+
+
 typedef tnodelst = List0(tnode)
 vtypedef tnodelst_vt = List0_vt(tnode)
 //
@@ -287,7 +323,7 @@ val T_IDENT_GT : tnode
 val T_IDENT_EQGT : tnode
 val T_IDENT_LTGT : tnode
 val T_IDENT_MSGT : tnode
-      
+
 (* ****** ****** *)
 //
 fun//{}
@@ -300,47 +336,59 @@ token_get_loc(tok: token): loc_t
 fun//{}
 token_get_node(tok: token): tnode
 //
-overload .loc with token_get_loc
-overload .node with token_get_node
+#symload .loc with token_get_loc
+#symload .node with token_get_node
 //
 (* ****** ****** *)
 //
 fun
 print_tnode : (tnode) -> void
+(*
 fun
 prerr_tnode : (tnode) -> void
 fun
 fprint_tnode : (FILEref, tnode) -> void
+*)
 //
-overload print with print_tnode
-overload prerr with prerr_tnode
-overload fprint with fprint_tnode
+#symload print with print_tnode
+(*
+#symload prerr with prerr_tnode
+#symload fprint with fprint_tnode
+*)
 //
 (* ****** ****** *)
 //
 fun
 print_token : (token) -> void
+(*
 fun
 prerr_token : (token) -> void
 fun
 fprint_token : (FILEref, token) -> void
+*)
 //
-overload print with print_token
-overload prerr with prerr_token
-overload fprint with fprint_token
+#symload print with print_token
+(*
+#symload prerr with prerr_token
+#symload fprint with fprint_token
+*)
 //
 (* ****** ****** *)
 //
 fun
 print2_tnode : (tnode) -> void
+(*
 fun
 prerr2_tnode : (tnode) -> void
 fun
 fprint2_tnode : (FILEref, tnode) -> void
+*)
 //
-overload print2 with print2_tnode
-overload prerr2 with prerr2_tnode
-overload fprint2 with fprint2_tnode
+#symload print2 with print2_tnode
+(*
+#symload prerr2 with prerr2_tnode
+#symload fprint2 with fprint2_tnode
+*)
 //
 (* ****** ****** *)
 //
@@ -348,22 +396,22 @@ fun
 char2tnode(c0: int): tnode
 //
 (* ****** ****** *)
-//
+
 fun
 tnode_is_AND : tnode -> bool
 fun
 tnode_is_BAR : tnode -> bool
-fun
-tnode_is_CLN : tnode -> bool
-//
+
 fun
 tnode_is_COMMA : tnode -> bool
 fun
-tnode_is_SMCLN : tnode -> bool
-//
+tnode_is_CLN : tnode -> bool
+
 fun
 tnode_is_BARSMCLN : tnode -> bool
-//
+fun
+tnode_is_SMCLN : tnode -> bool
+
 (* ****** ****** *)
 
 fun tnode_is_blank(tnode): bool

@@ -13,12 +13,12 @@
 ** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
 ** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-** 
+**
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-** 
+**
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -33,17 +33,23 @@
 //
 (* ****** ****** *)
 //
+(*
 #include
 "share/atspre_staload.hats"
 #staload
 UN = "prelude/SATS/unsafe.sats"
+*)
+#staload STDLIB = "libats/SATS/stdlib.sats"
+#staload _ = "libats/DATS/stdlib.dats"
+
+#staload UN = "libats/SATS/unsafe.sats"
 //
 (* ****** ****** *)
 //
 #staload
 "./../SATS/label0.sats"
 #staload
-"./../SATS/locinfo.sats"
+"./../SATS/location.sats"
 //
 #staload "./../SATS/lexing.sats"
 #staload "./../SATS/staexp0.sats"
@@ -258,7 +264,7 @@ l0abl_make_int1
 val-
 T_INT1(rep) = tok.node()
 //
-val i0 = g0string2int(rep)
+val i0 = $STDLIB.atoi(rep)
 val lab = label_make_int(i0)
 //
 in
@@ -347,68 +353,6 @@ case+ x0 of
 | DQ0EIDsome(tok, id0) => tok.loc()+id0.loc()
 )
 //
-(* ****** ****** *)
-
-local
-
-absimpl
-g0exp_tbox = $rec{
-  g0exp_loc= loc_t
-, g0exp_node= g0exp_node
-} (* end of [absimpl] *)
-
-in (* in-of-local *)
-
-implement
-g0exp_get_loc(x0) = x0.g0exp_loc
-implement
-g0exp_get_node(x0) = x0.g0exp_node
-
-(* ****** ****** *)
-
-implement
-g0exp_make_node
-(loc, node) = $rec
-{
-  g0exp_loc= loc, g0exp_node= node
-} (* end of [g0exp_make_node] *)
-
-(* ****** ****** *)
-
-end // end of [local]
-
-(* ****** ****** *)
-
-local
-
-absimpl
-g0marg_tbox = $rec{
-  g0marg_loc= loc_t
-, g0marg_node= g0marg_node
-}
-
-in (* in-of-local *)
-
-(* ****** ****** *)
-
-implement
-g0marg_get_loc(x0) = x0.g0marg_loc
-implement
-g0marg_get_node(x0) = x0.g0marg_node
-
-(* ****** ****** *)
-
-implement
-g0marg_make_node
-(loc, node) = $rec
-{
-  g0marg_loc= loc, g0marg_node= node
-} (* end of [g0marg_make_node] *)
-
-(* ****** ****** *)
-
-end // end of [local]
-
 (* ****** ****** *)
 
 local
@@ -755,8 +699,8 @@ s0exp_anno_opt
 (s0e, opt) =
 (
 case+ opt of
-| None() => s0e
-| Some(s0t) => let
+| optn1_none() => s0e
+| optn1_some(s0t) => let
     val
     loc = s0e.loc()+s0t.loc()
   in
@@ -789,7 +733,7 @@ case+ x0 of
 | s0exp_RPAREN_cons1
     (tok1, s0es, tok2) => tok1.loc() + tok2.loc()
   // s0exp_RPAREN_cons1
-)  
+)
 //
 (* ****** ****** *)
 //
@@ -803,7 +747,7 @@ case+ x0 of
 | labs0exp_RBRACE_cons1
     (tok1, ls0es, tok2) => tok1.loc() + tok2.loc()
   // labs0exp_RBRACE_cons1
-)  
+)
 //
 (* ****** ****** *)
 

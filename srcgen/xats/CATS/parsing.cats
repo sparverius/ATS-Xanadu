@@ -5,7 +5,7 @@
 /***********************************************************************/
 
 /*
-** ATS/Xanadu - Unleashing the Potential of Types!
+** ATS/Postiats - Unleashing the Potential of Types!
 ** Copyright (C) 2018 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
@@ -32,12 +32,10 @@
 // Authoremail: gmhwxi@gmail.com
 //
 /* ****** ****** */
-//
-#ifndef \
-ATS3_SRCGEN_CATS_XATS_PARSING
-#define \
-ATS3_SRCGEN_CATS_XATS_PARSING
-//
+
+#ifndef XANADU_SRCGEN_CATS_PARSING
+#define XANADU_SRCGEN_CATS_PARSING
+
 /* ****** ****** */
 
 /*
@@ -61,10 +59,9 @@ typedef struct {
 } xats_tokbuf_struct ;
 
 /* ****** ****** */
-//
-#endif // end if [ifndef]
-// [ATS3_SRCGEN_CATS_XATS_PARSING]
-//
+
+#endif // end of [XANADU_SRCGEN_CATS_PARSING]
+
 /* ****** ****** */
 
 /* end of [xats_parsing.cats] */

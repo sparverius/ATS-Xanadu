@@ -5,7 +5,7 @@
 (***********************************************************************)
 
 (*
-** ATS/Xanadu - Unleashing the Potential of Types!
+** ATS/Postiats - Unleashing the Potential of Types!
 ** Copyright (C) 2018 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
@@ -13,12 +13,12 @@
 ** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
 ** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-** 
+**
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-** 
+**
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -33,15 +33,22 @@
 //
 (* ****** ****** *)
 //
-#include
-"share/atspre_staload.hats"
+#staload "libats/SATS/gint.sats"
+#staload _ = "libats/DATS/gint.dats"
+
+#staload "libats/SATS/stdio.sats"
+#staload _ = "libats/DATS/stdio.dats"
+
+#staload "libats/SATS/list.sats"
+#staload _ = "libats/DATS/list.dats"
+
+#staload "libats/SATS/list_vt.sats"
+#staload _ = "libats/DATS/list_vt.dats"
+
 #staload
-UN = "prelude/SATS/unsafe.sats"
+UN =
+"libats/SATS/unsafe.sats"
 //
-(* ****** ****** *)
-
-#staload "./../SATS/filpath.sats"
-
 (* ****** ****** *)
 
 #staload "./../SATS/lexing.sats"
@@ -112,22 +119,6 @@ end // end of [p_BAR]
 (* ****** ****** *)
 
 implement
-p_CLN
-  (buf, err) = let
-  val e0 = err
-  val tok = buf.get0()
-in
-  case+
-  tok.node() of
-  | T_CLN() =>
-    let val () = buf.incby1() in tok end
-  | _ (* non-COLON *) =>
-    let val ( ) = (err := e0 + 1) in tok end
-end // end of [p_CLN]
-
-(* ****** ****** *)
-
-implement
 p_EQGT
   (buf, err) = let
   val e0 = err
@@ -140,6 +131,22 @@ in
   | _ (* non-EQ *) =>
     let val ( ) = (err := e0 + 1) in tok end
 end // end of [p_EQGT]
+
+(* ****** ****** *)
+
+implement
+p_COLON
+  (buf, err) = let
+  val e0 = err
+  val tok = buf.get0()
+in
+  case+
+  tok.node() of
+  | T_CLN() =>
+    let val () = buf.incby1() in tok end
+  | _ (* non-COLON *) =>
+    let val ( ) = (err := e0 + 1) in tok end
+end // end of [p_COLON]
 
 (* ****** ****** *)
 
@@ -348,11 +355,11 @@ in
   case+
   tok.node() of
   | T_BAR() =>
-    Some(tok) where
+    optn1_some(tok) where
     {
       val () = buf.incby1()
     } (* T_BAR *)
-  | _ (* non-BAR *) => None(*void*)
+  | _ (* non-BAR *) => optn1_none(*void*)
 end // end of [popt_BAR]
 
 (* ****** ****** *)
@@ -367,11 +374,11 @@ in
   case+
   tok.node() of
   | T_SMCLN() =>
-    Some(tok) where
+    optn1_some(tok) where
     {
       val () = buf.incby1()
     } (* T_SMCLN *)
-  | _ (* non-SMCLN *) => None(*void*)
+  | _ (* non-SMCLN *) => optn1_none(*void*)
 end // end of [popt_SMCLN]
 
 (* ****** ****** *)
@@ -386,40 +393,36 @@ in
   case+
   tok.node() of
   | T_LBRACE() =>
-    Some(tok) where
+    optn1_some(tok) where
     {
       val () = buf.incby1()
     } (* T_LBRACE *)
-  | _ (* non-LBRACE *) => None(*void*)
+  | _ (* non-LBRACE *) => optn1_none(*void*)
 end // end of [popt_LBRACE]
 
 (* ****** ****** *)
 
 implement
-popt_ENDIF
-  (buf, err) = let
+popt_ENDIF(buf, err) = let
 //
   val tok = buf.get0()
 //
 in
   case+
   tok.node() of
-  | T_END() =>
-    Some(tok) where
+  | T_END() => optn1_some(tok) where
     {
       val () = buf.incby1()
-    } (* T_END *)
-  | T_ENDIF() =>
-    Some(tok) where
+    }
+  | T_ENDIF() => optn1_some(tok) where
     {
       val () = buf.incby1()
-    } (* T_ENDIF *)
-  | _ (* non-BAR *) => None(*void*)
+    }
+  | _ (* non-BAR *) => optn1_none(*void*)
 end // end of [popt_ENDIF]
 
 implement
-popt_ENDCASE
-  (buf, err) = let
+popt_ENDCASE(buf, err) = let
 //
   val tok = buf.get0()
 //
@@ -427,23 +430,22 @@ in
   case+
   tok.node() of
   | T_END() =>
-    Some(tok) where
+    optn1_some(tok) where
     {
       val () = buf.incby1()
     } (* T_END *)
   | T_ENDCASE() =>
-    Some(tok) where
+    optn1_some(tok) where
     {
       val () = buf.incby1()
     } (* T_ENDCASE *)
-  | _ (* non-BAR *) => None(*void*)
+  | _ (* non-BAR *) => optn1_none(*void*)
 end // end of [popt_ENDCASE]
 
 (* ****** ****** *)
 
 implement
-popt_ENDLAM
-  (buf, err) = let
+popt_ENDLAM(buf, err) = let
 //
   val tok = buf.get0()
 //
@@ -451,16 +453,16 @@ in
   case+
   tok.node() of
   | T_END() =>
-    Some(tok) where
+    optn1_some(tok) where
     {
       val () = buf.incby1()
     } (* T_END *)
   | T_ENDLAM() =>
-    Some(tok) where
+    optn1_some(tok) where
     {
       val () = buf.incby1()
     } (* T_ENDCASE *)
-  | _ (* non-BAR *) => None(*void*)
+  | _ (* non-BAR *) => optn1_none(*void*)
 end // end of [popt_ENDLAM]
 
 (* ****** ****** *)
@@ -476,11 +478,7 @@ pstar_fun
 *)
 //
 implement
-pstar_fun
-  {a}
-(
-  buf, err, fpar
-) = let
+pstar_fun{a}(buf, err, fpar) = let
 //
 val e0 = err
 //
@@ -499,10 +497,10 @@ in
     val () =
     (
       res :=
-      list_vt_cons{a}{0}(x0, _)
+      list1_vt_cons{a}{0}(x0, _)
     )
     val+
-    list_vt_cons(_, res1) = res
+    list1_vt_cons(_, res1) = res
     val () = loop(buf, err, res1)
     prval ((*folded*)) = fold@(res)
   in
@@ -511,7 +509,7 @@ in
   else let
     val () = err := e0
   in
-    res := list_vt_nil((*void*))
+    res := list1_vt_nil((*void*))
   end // end of [else]
 end // end of [loop]
 //
@@ -531,18 +529,11 @@ pstar_sep_fun
 ) : List0_vt(a) // end of [pstar_sep_fun]
 *)
 implement
-pstar_sep_fun
-  {a}
-( buf, err
-, fsep, fpar) = let
+pstar_sep_fun{a}(buf, err, fsep, fpar) = let
 //
 fun
 loop
-( buf:
- &tokbuf >> _
-, err: &int >> _
-, res: &ptr? >> List0_vt(a)
-) : void = let
+(buf: &tokbuf >> _, err: &int >> _, res: &ptr? >> List0_vt(a)) : void = let
   val sep = buf.get0()
 in
   if
@@ -553,15 +544,15 @@ in
     val () =
     (
       res :=
-      list_vt_cons{a}{0}(x0, _)
+      list1_vt_cons{a}{0}(x0, _)
     )
-    val+list_vt_cons(_, res1) = res
+    val+list1_vt_cons(_, res1) = res
     val () = loop(buf, err, res1)
     prval ((*folded*)) = fold@(res)
   in
     // nothing
   end // end of [then]
-  else (res := list_vt_nil(*void*))
+  else (res := list1_vt_nil(*void*))
 end // end of [loop]
 //
 val e0 = err
@@ -574,21 +565,17 @@ in
     var res: ptr
   in
     loop(buf, err, res);
-    list_vt_cons(x0, res)
+    list1_vt_cons(x0, res)
   end // end of [then]
   else let
-    val () = (err := e0) in list_vt_nil(*void*)
+    val () = (err := e0) in list1_vt_nil(*void*)
   end // end of [else]
 end // end of [pstar_sep_fun]
 
 (* ****** ****** *)
 //
 implement
-pstar_AND_fun
-  {a}
-(
-  buf, err, fpar
-) = (
+pstar_AND_fun{a}(buf, err, fpar) = (
 //
 pstar_sep_fun
 (buf, err, tnode_is_AND, fpar)
@@ -596,11 +583,7 @@ pstar_sep_fun
 ) (* end of [pstar_AND_fun] *)
 //
 implement
-pstar_BAR_fun
-  {a}
-(
-  buf, err, fpar
-) = (
+pstar_BAR_fun{a}(buf, err, fpar) = (
 //
 pstar_sep_fun
 (buf, err, tnode_is_BAR, fpar)
@@ -610,11 +593,7 @@ pstar_sep_fun
 (* ****** ****** *)
 //
 implement
-pstar_COMMA_fun
-  {a}
-(
-  buf, err, fpar
-) = (
+pstar_COMMA_fun{a}(buf, err, fpar) = (
 //
 pstar_sep_fun
 (buf, err, tnode_is_COMMA, fpar)
@@ -624,11 +603,7 @@ pstar_sep_fun
 (* ****** ****** *)
 //
 implement
-pstar_SMCLN_fun
-  {a}
-(
-  buf, err, fpar
-) = (
+pstar_SMCLN_fun{a}(buf, err, fpar) = (
 //
 pstar_sep_fun
 (buf, err, tnode_is_SMCLN, fpar)
@@ -636,11 +611,7 @@ pstar_sep_fun
 ) (* end of [pstar_SMCLN_fun] *)
 //
 implement
-pstar_BARSMCLN_fun
-  {a}
-(
-  buf, err, fpar
-) = (
+pstar_BARSMCLN_fun{a}(buf, err, fpar) = (
 //
 pstar_sep_fun
 (buf, err, tnode_is_BARSMCLN, fpar)
@@ -654,29 +625,16 @@ pstar_sep_fun
 // static/dynamic: 0/1
 //
 implement
-parse_from_stdin_toplevel
-  (stadyn) =
-let
-  val inp = stdin_ref
-in
-//
-parse_from_fileref_toplevel
-  (stadyn, inp)
-//
-end
+parse_from_stdin_toplevel(stadyn) =
+  parse_from_fileref_toplevel(stadyn, the_stdin<>())
+  //stdin_ref)
 // end of [parser_from_stdin_toplevel]
 //
 implement
-parse_from_fileref_toplevel
-  (stadyn, inp) = let
+parse_from_fileref_toplevel(stadyn, inp) = let
 //
-val
-toks =
-fileref_tokenize(inp)
-val
-toks =
-list_vt2t
-(lexing_preprocess_tokenlst(toks))
+val toks = fileref_tokenize(inp)
+val toks = list1_vt2t(lexing_preprocess_tokenlst(toks))
 //
 (*
 val _(*ntok*) =
@@ -704,33 +662,6 @@ end
 //
 end // end of [parse_from_fileref_toplevel]
 //
-(* ****** ****** *)
-
-implement
-parse_from_filpath_toplevel
-  (stadyn, fp0) = let
-//
-val fnm = fp0.full1()
-val opt =
-  fileref_open_opt(fnm, file_mode_r)
-//
-in
-//
-case+ opt of
-| ~None_vt() =>
-   None_vt()
-| ~Some_vt(inp) =>
-  let
-    val d0cs =
-    parse_from_fileref_toplevel
-      (stadyn, inp)
-    val ((*void*)) = fileref_close(inp)
-  in
-    Some_vt(d0cs)
-  end // end of [Some_vt]
-//
-end // end of [parser_from_filpath_toplevel]
-
 (* ****** ****** *)
 
 (* end of [xats_parsing_basics.dats] *)
