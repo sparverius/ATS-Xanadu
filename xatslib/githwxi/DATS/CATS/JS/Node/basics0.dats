@@ -25,6 +25,10 @@ XATS2JS_NODE_g_stdout
 fun
 XATS2JS_NODE_g_stderr
 ((*void*)): FILR = $extnam()
+#extern
+fun
+XATS2JS_NODE_fs_rexists
+(path: strn): bool = $extnam()
 //
 #impltmp
 g_stdin< > = XATS2JS_NODE_g_stdin
@@ -37,11 +41,15 @@ g_stderr< > = XATS2JS_NODE_g_stderr
 
 #impltmp
 <>(*tmp*)
-fpath_exists
+fpath_rexists
   (path) =
 let
 val
-opt = XATS2JS_NODE_fs_access
+(* opt = XATS2JS_NODE_fs_access *)
+opt = XATS2JS_NODE_fs_rexists(path)
+in
+opt
+end
 
 (* ****** ****** *)
 
